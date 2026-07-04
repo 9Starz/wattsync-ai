@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  --background: #070b12;
+  --surface: #0e1520;
+  --surface-raised: #131c2a;
+  --border: #223047;
+  --foreground: #e7edf5;
+  --muted: #8ca0b8;
+  --accent-green: #34d399;
+  --accent-green-dim: #10b981;
+  --accent-blue: #38bdf8;
+  --accent-blue-dim: #0ea5e9;
+  --warning: #fbbf24;
+  --critical: #f87171;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-border: var(--border);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent-green: var(--accent-green);
+  --color-accent-green-dim: var(--accent-green-dim);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-blue-dim: var(--accent-blue-dim);
+  --color-warning: var(--warning);
+  --color-critical: var(--critical);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: radial-gradient(circle at 15% 0%, #0d1b2a 0%, var(--background) 45%);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  min-height: 100%;
+}
+
+::selection {
+  background: var(--accent-green-dim);
+  color: #04140f;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 9999px;
+}
