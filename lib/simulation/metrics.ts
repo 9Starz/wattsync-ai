@@ -66,8 +66,13 @@ function clampPct(v: number) {
   return Math.min(100, Math.max(0, v));
 }
 
+/** Current wall-clock time as a fractional hour of the day (e.g. 19.55 for 7:33 PM). */
+export function getNowHour(): number {
+  return new Date().getHours() + new Date().getMinutes() / 60;
+}
+
 export function latestPoint(series: DaySeries): IntervalPoint {
-  const nowHour = new Date().getHours() + new Date().getMinutes() / 60;
+  const nowHour = getNowHour();
   let closest = series.points[0];
   let closestDelta = Infinity;
   for (const p of series.points) {

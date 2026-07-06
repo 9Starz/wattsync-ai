@@ -1,10 +1,20 @@
 "use client";
 
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ReferenceArea,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { IntervalPoint } from "@/lib/simulation";
 import { formatHourLabel, formatKw } from "@/lib/utils/format";
 
-export function EnergyMixChart({ points }: { points: IntervalPoint[] }) {
+export function EnergyMixChart({ points, nowHour }: { points: IntervalPoint[]; nowHour: number }) {
   const data = points.map((p) => ({
     hour: p.hour,
     Solar: Math.round(p.solarKw),
@@ -43,12 +53,22 @@ export function EnergyMixChart({ points }: { points: IntervalPoint[] }) {
         <YAxis stroke="#8ca0b8" fontSize={11} tickLine={false} tickFormatter={(v) => `${v}`} width={48} />
         <Tooltip
           contentStyle={{ background: "#131c2a", border: "1px solid #223047", borderRadius: 8, fontSize: 12 }}
-          labelFormatter={(h) => formatHourLabel(h as number)}
+          labelFormatter={(h) =>
+            `${formatHourLabel(h as number)}${(h as number) > nowHour ? " · AI projection" : ""}`
+          }
           formatter={(value) => formatKw(Number(value))}
         />
         <Area type="monotone" dataKey="Solar" stackId="1" stroke="#fbbf24" fill="url(#solarGradient)" strokeWidth={1.5} />
         <Area type="monotone" dataKey="Wind" stackId="1" stroke="#38bdf8" fill="url(#windGradient)" strokeWidth={1.5} />
         <Area type="monotone" dataKey="Hydro" stackId="1" stroke="#34d399" fill="url(#hydroGradient)" strokeWidth={1.5} />
+        <ReferenceArea x1={nowHour} x2={24} fill="#0b1220" fillOpacity={0.55} />
+        <ReferenceLine
+          x={nowHour}
+          stroke="#34d399"
+          strokeWidth={1.5}
+          strokeDasharray="4 3"
+          label={{ value: "Now", position: "insideTopRight", fill: "#34d399", fontSize: 11 }}
+        />
       </AreaChart>
     </ResponsiveContainer>
   );

@@ -1,0 +1,202 @@
+import { forecastNext24h, Forecast24h } from "@/lib/forecasting";
+import {
+  Alert,
+  Asset,
+  DashboardData,
+  getActiveAlerts,
+  getDashboardData,
+  getLiveAssets,
+  getNowHour,
+} from "@/lib/simulation";
+import { formatHourLabel, formatKg, formatKw, formatKwh, formatUsd } from "@/lib/utils/format";
+import { getRecommendations, Recommendation } from "./recommendations";
+
+/** Everything the copilot can ground an answer in — one snapshot per question. */
+interface CopilotContext {
+  nowHour: number;
+  data: DashboardData;
+  assets: Asset[];
+  alerts: Alert[];
+  forecast: Forecast24h;
+  recommendations: Recommendation[];
+}
+
+function buildContext(): CopilotContext {
+  return {
+    nowHour: getNowHour(),
+    data: getDashboardData(),
+    assets: getLiveAssets(),
+    alerts: getActiveAlerts(),
+    forecast: forecastNext24h(),
+    recommendations: getRecommendations(),
+  };
+}
+
+/**
+ * Intent router: each entry pairs keyword triggers with an answer builder that reads
+ * real numbers out of the context. First match wins; order matters (more specific
+ * intents first). This is the "smart rule-based copilot" — an LLM provider can replace
+ * answerQuestion() wholesale (see provider seam below) without touching the UI or API route.
+ */
+const INTENTS: { match: RegExp; answer: (ctx: CopilotContext) => string }[] = [
+  {
+    match: /(why|what).*(demand|load).*(high|peak|rising|up)|demand.*(why|high)/i,
+    answer: (ctx) => {
+      const { current } = ctx.data;
+      const peak = ctx.forecast.insights.peakDemand;
+      const evShare = Math.round((current.evDemandKw / Math.max(1, current.totalDemandKw)) * 100);
+      return (
+        `Total demand is currently ${formatKw(current.totalDemandKw)} — buildings account for ${formatKw(current.buildingDemandKw)} and EV charging adds ${formatKw(current.evDemandKw)} (${evShare}% of the total). ` +
+        `Demand climbs through the late afternoon as building HVAC load overlaps with commuter EV charging, and is forecast to peak at ${formatKw(peak.kw)} around ${formatHourLabel(peak.hourOfDay)}. ` +
+        `Electricity is priced at $${current.electricityPrice.toFixed(2)}/kWh right now, so the optimizer is working to keep grid imports low through this window.`
+      );
+    },
+  },
+  {
+    match: /(what|how).*(before|prepare|ready|do).*(peak|6\s?pm|evening)|before.*peak/i,
+    answer: (ctx) => {
+      const { current } = ctx.data;
+      const peak = ctx.forecast.insights.peakDemand;
+      const top = ctx.recommendations.slice(0, 3);
+      const steps = top.map((r, i) => `${i + 1}. ${r.action} (${Math.round(r.confidence * 100)}% confidence)`).join(" ");
+      return (
+        `Demand peaks at ${formatKw(peak.kw)} around ${formatHourLabel(peak.hourOfDay)}. The battery is at ${Math.round(current.batterySocPercent)}% state of charge. My playbook before the peak: ${steps} ` +
+        `Executed together, these keep on-peak grid imports to a minimum while power costs $0.34/kWh.`
+      );
+    },
+  },
+  {
+    match: /(which|what).*(asset|farm|turbine|plant).*(underperform|worst|weak|low|problem)|underperforming/i,
+    answer: (ctx) => {
+      const ranked = ctx.assets
+        .filter((a) => a.type !== "battery_storage" && a.type !== "ev_charging_station" && a.type !== "smart_building")
+        .map((a) => ({ a, ratio: a.currentOutputKw / a.capacityKw }))
+        .sort((x, y) => x.ratio - y.ratio);
+      const worst = ranked[0];
+      const alertNote = ctx.alerts.find((al) => al.assetId === worst.a.id);
+      return (
+        `${worst.a.name} is the weakest performer right now, producing ${formatKw(worst.a.currentOutputKw)} of its ${formatKw(worst.a.capacityKw)} capacity (${Math.round(worst.ratio * 100)}% utilization, health score ${worst.a.healthScore}/100). ` +
+        (alertNote
+          ? `There is an active alert on it: ${alertNote.cause} Recommended action: ${alertNote.recommendedAction}`
+          : `No active alerts on it — current output is consistent with ${ctx.data.current.weather.replace("_", " ")} conditions and the time of day.`)
+      );
+    },
+  },
+  {
+    match: /(how much|what).*(renewable|clean|green).*(us|share|percent|using)|renewable.*(percent|share|much)/i,
+    answer: (ctx) => {
+      const { aiTotals, rawTotals, current } = ctx.data;
+      return (
+        `Right now the fleet is generating ${formatKw(current.totalGenerationKw)} of renewable power against ${formatKw(current.totalDemandKw)} of demand. ` +
+        `Across today, ${Math.round(aiTotals.renewablePct)}% of energy consumed is renewable under AI dispatch — versus ${Math.round(rawTotals.renewablePct)}% without it. ` +
+        `Total renewable production today is on track for ${formatKwh(aiTotals.totalGenerationKwh)}, and the 24h forecast shows a net ${ctx.forecast.insights.netSurplusKwh >= 0 ? "surplus" : "shortage"} of ${formatKwh(Math.abs(ctx.forecast.insights.netSurplusKwh))}.`
+      );
+    },
+  },
+  {
+    match: /(biggest|main|top|what).*(risk|threat|concern|worry)|risk.*today/i,
+    answer: (ctx) => {
+      const { gridRisk, worstShortage, peakDemand } = ctx.forecast.insights;
+      const worstAlert = ctx.alerts[0];
+      return (
+        `The biggest risk today is grid import exposure during the evening peak — I rate it ${gridRisk.level.toUpperCase()}. ${gridRisk.reason} ` +
+        (worstShortage
+          ? `The tightest moment lands around ${formatHourLabel(worstShortage.hourOfDay)}, when demand outruns renewables by ~${formatKw(worstShortage.kw)}. `
+          : "") +
+        `Peak demand of ${formatKw(peakDemand.kw)} is expected near ${formatHourLabel(peakDemand.hourOfDay)}.` +
+        (worstAlert ? ` On the asset side: ${worstAlert.cause}` : "")
+      );
+    },
+  },
+  {
+    match: /(cost|money|sav|dollar|\$)/i,
+    answer: (ctx) => {
+      const { costSavedUsd, peakDemandReductionKw, aiTotals, rawTotals } = ctx.data;
+      return (
+        `AI dispatch has saved ${formatUsd(costSavedUsd)} today versus running the same fleet without optimization (${formatUsd(rawTotals.totalCostUsd)} unoptimized vs ${formatUsd(aiTotals.totalCostUsd)} optimized). ` +
+        `The savings come from charging the battery on midday solar surplus instead of buying $0.34/kWh on-peak power, plus cutting peak grid import by ${formatKw(peakDemandReductionKw)}.`
+      );
+    },
+  },
+  {
+    match: /(carbon|co2|emission|climate)/i,
+    answer: (ctx) => {
+      const { carbonSavedKg, aiTotals, rawTotals } = ctx.data;
+      return (
+        `The VPP has avoided ${formatKg(carbonSavedKg)} of CO₂ today by displacing grid imports with stored renewable energy (${formatKg(rawTotals.totalCarbonKg)} unoptimized vs ${formatKg(aiTotals.totalCarbonKg)} with AI dispatch, at 0.4 kg CO₂/kWh grid intensity). ` +
+        `Renewable coverage of demand is up ${Math.round(ctx.data.renewablePctImprovement)} percentage points thanks to load shifting and battery timing.`
+      );
+    },
+  },
+  {
+    match: /(battery|soc|storage|charge level)/i,
+    answer: (ctx) => {
+      const { current } = ctx.data;
+      const flow =
+        current.batteryFlowKw > 10
+          ? `charging at ${formatKw(current.batteryFlowKw)}`
+          : current.batteryFlowKw < -10
+            ? `discharging at ${formatKw(Math.abs(current.batteryFlowKw))}`
+            : "idle";
+      const rec = ctx.recommendations.find((r) => r.id === "rec-discharge-peak" || r.id === "rec-charge-midday");
+      return (
+        `The Central Battery Array is at ${Math.round(current.batterySocPercent)}% state of charge and currently ${flow}. ` +
+        (rec ? `Next move: ${rec.action}` : "No battery action is scheduled — SOC is where the optimizer wants it.")
+      );
+    },
+  },
+  {
+    match: /(weather|cloud|rain|sun|wind speed)/i,
+    answer: (ctx) =>
+      `${ctx.forecast.insights.weatherImpact} Current conditions: ${ctx.data.current.weather.replace("_", " ")}.`,
+  },
+  {
+    match: /(forecast|predict|tomorrow|next 24|outlook)/i,
+    answer: (ctx) => {
+      const { peakDemand, peakGeneration, netSurplusKwh, gridRisk } = ctx.forecast.insights;
+      return (
+        `Over the next 24 hours: generation peaks at ${formatKw(peakGeneration.kw)} around ${formatHourLabel(peakGeneration.hourOfDay)}, demand peaks at ${formatKw(peakDemand.kw)} around ${formatHourLabel(peakDemand.hourOfDay)}, ` +
+        `and the fleet runs a net renewable ${netSurplusKwh >= 0 ? "surplus" : "shortage"} of ${formatKwh(Math.abs(netSurplusKwh))}. Grid import risk is ${gridRisk.level}. ${ctx.forecast.insights.weatherImpact}`
+      );
+    },
+  },
+  {
+    match: /(alert|warning|problem|issue|wrong)/i,
+    answer: (ctx) => {
+      if (ctx.alerts.length === 0) return "No active alerts — every asset in the fleet is operating within normal parameters.";
+      const lines = ctx.alerts.map((a) => `${a.assetName} (${a.severity}): ${a.cause} → ${a.recommendedAction}`);
+      return `There ${ctx.alerts.length === 1 ? "is 1 active alert" : `are ${ctx.alerts.length} active alerts`}: ${lines.join(" ")}`;
+    },
+  },
+];
+
+function fallbackAnswer(ctx: CopilotContext): string {
+  const { current } = ctx.data;
+  const top = ctx.recommendations[0];
+  return (
+    `Here's the current picture: renewable generation is ${formatKw(current.totalGenerationKw)} against ${formatKw(current.totalDemandKw)} of demand, the battery sits at ${Math.round(current.batterySocPercent)}%, and grid import risk over the next 24h is ${ctx.forecast.insights.gridRisk.level}. ` +
+    (top ? `Top recommendation right now: ${top.title.toLowerCase()} — ${top.action} ` : "") +
+    `You can ask me things like "Why is demand high today?", "What should we do before the 6pm peak?", "Which asset is underperforming?", or "What is the biggest risk today?"`
+  );
+}
+
+/**
+ * Provider seam. Today this always routes to the rule-based engine; when an LLM key is
+ * configured, swap the branch below for a real API call that passes buildContext() as
+ * grounding data. The function signature stays identical either way.
+ *
+ * TODO(phase-4): add an Anthropic Claude provider —
+ *   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+ *   stream a messages.create() call with JSON.stringify(ctx) in the system prompt.
+ *   (OpenAI GPT / Google Gemini would slot in the same way behind this seam.)
+ */
+export function answerQuestion(question: string): string {
+  const ctx = buildContext();
+
+  // if (process.env.ANTHROPIC_API_KEY) return answerWithClaude(question, ctx);  // future LLM path
+
+  for (const intent of INTENTS) {
+    if (intent.match.test(question)) return intent.answer(ctx);
+  }
+  return fallbackAnswer(ctx);
+}

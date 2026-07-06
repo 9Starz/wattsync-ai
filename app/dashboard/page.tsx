@@ -6,13 +6,21 @@ import { DemandVsSupplyChart } from "@/components/dashboard/DemandVsSupplyChart"
 import { BatterySocGauge } from "@/components/dashboard/BatterySocGauge";
 import { AiRecommendationCard } from "@/components/dashboard/AiRecommendationCard";
 import { AlertCard } from "@/components/alerts/AlertCard";
-import { getActiveAlerts, getDashboardData } from "@/lib/simulation";
-import { formatKg, formatKw, formatPct, formatUsd } from "@/lib/utils/format";
+import { AiInsightsRow } from "@/components/dashboard/AiInsightsRow";
+import { forecastNext24h } from "@/lib/forecasting";
+import { getRecommendations } from "@/lib/ai/recommendations";
+import { getActiveAlerts, getDashboardData, getNowHour } from "@/lib/simulation";
+import { formatHourLabel, formatKg, formatKw, formatPct, formatUsd } from "@/lib/utils/format";
+
+export const dynamic = "force-dynamic";
 
 export default function DashboardPage() {
   const data = getDashboardData();
   const alerts = getActiveAlerts();
   const { current } = data;
+  const nowHour = getNowHour();
+  const forecast = forecastNext24h();
+  const recommendations = getRecommendations();
 
   return (
     <div className="flex flex-1 flex-col">
@@ -46,16 +54,26 @@ export default function DashboardPage() {
           />
         </div>
 
+        <AiInsightsRow current={current} forecast={forecast} topRecommendation={recommendations[0]} />
+
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-          <SectionCard title="Energy Mix (24h)" subtitle="Solar, wind, hydro generation" className="xl:col-span-2">
-            <EnergyMixChart points={data.aiOptimized.points} />
+          <SectionCard
+            title="Energy Mix (24h)"
+            subtitle={`Solar, wind, hydro — actual to ${formatHourLabel(nowHour)}, AI projection beyond`}
+            className="xl:col-span-2"
+          >
+            <EnergyMixChart points={data.aiOptimized.points} nowHour={nowHour} />
           </SectionCard>
-          <AiRecommendationCard current={current} />
+          <AiRecommendationCard recommendation={recommendations[0]} />
         </div>
 
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-          <SectionCard title="Demand vs. Supply (24h)" subtitle="AI-optimized scenario, dashed line = grid import" className="xl:col-span-2">
-            <DemandVsSupplyChart points={data.aiOptimized.points} />
+          <SectionCard
+            title="Demand vs. Supply (24h)"
+            subtitle={`Actual to ${formatHourLabel(nowHour)}, AI projection beyond · dashed red = grid import`}
+            className="xl:col-span-2"
+          >
+            <DemandVsSupplyChart points={data.aiOptimized.points} nowHour={nowHour} />
           </SectionCard>
           <SectionCard title="Active Alerts" subtitle={`${alerts.length} needing attention`}>
             <div className="space-y-3">

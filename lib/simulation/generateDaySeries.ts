@@ -206,16 +206,34 @@ function hourToIso(hour: number): string {
   return d.toISOString();
 }
 
-let cache: { raw: DaySeries; aiOptimized: DaySeries } | null = null;
+const cache = new Map<number, { raw: DaySeries; aiOptimized: DaySeries }>();
 
-/** Generates (and memoizes) today's raw + AI-optimized 24h series with a stable seed. */
-export function getTodaySeries(): { raw: DaySeries; aiOptimized: DaySeries } {
-  if (cache) return cache;
-  const seed = new Date().getFullYear() * 10000 + (new Date().getMonth() + 1) * 100 + new Date().getDate();
+function seedForDayOffset(dayOffset: number): number {
+  const d = new Date();
+  d.setDate(d.getDate() + dayOffset);
+  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+}
+
+/** Generates (and memoizes) a full day's raw + AI-optimized series, seeded by calendar date. */
+export function getDaySeries(dayOffset = 0): { raw: DaySeries; aiOptimized: DaySeries } {
+  const seed = seedForDayOffset(dayOffset);
+  const cached = cache.get(seed);
+  if (cached) return cached;
   const base = generateBaseCurves(seed);
-  cache = {
-    raw: { variant: "raw", points: buildRawVariant(base, seed) },
-    aiOptimized: { variant: "ai_optimized", points: buildAiOptimizedVariant(base, seed) },
+  const result = {
+    raw: { variant: "raw" as const, points: buildRawVariant(base, seed) },
+    aiOptimized: { variant: "ai_optimized" as const, points: buildAiOptimizedVariant(base, seed) },
   };
-  return cache;
+  cache.set(seed, result);
+  if (cache.size > 4) {
+    // Keep only the most recent few days so a long-lived server process can't grow unbounded.
+    const oldest = cache.keys().next().value;
+    if (oldest !== undefined) cache.delete(oldest);
+  }
+  return result;
+}
+
+/** Today's series — the main entry point used by dashboard/asset views. */
+export function getTodaySeries(): { raw: DaySeries; aiOptimized: DaySeries } {
+  return getDaySeries(0);
 }
