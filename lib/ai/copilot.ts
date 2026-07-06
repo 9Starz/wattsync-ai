@@ -1,5 +1,11 @@
 import { forecastNext24h, Forecast24h } from "@/lib/forecasting";
 import {
+  getOptimizationComparison,
+  getOptimizationDecisions,
+  OptimizationComparison,
+  OptimizationDecision,
+} from "@/lib/optimization";
+import {
   Alert,
   Asset,
   DashboardData,
@@ -19,6 +25,8 @@ interface CopilotContext {
   alerts: Alert[];
   forecast: Forecast24h;
   recommendations: Recommendation[];
+  comparison: OptimizationComparison;
+  decisions: OptimizationDecision[];
 }
 
 function buildContext(): CopilotContext {
@@ -29,6 +37,8 @@ function buildContext(): CopilotContext {
     alerts: getActiveAlerts(),
     forecast: forecastNext24h(),
     recommendations: getRecommendations(),
+    comparison: getOptimizationComparison(),
+    decisions: getOptimizationDecisions(),
   };
 }
 
@@ -39,6 +49,71 @@ function buildContext(): CopilotContext {
  * answerQuestion() wholesale (see provider seam below) without touching the UI or API route.
  */
 const INTENTS: { match: RegExp; answer: (ctx: CopilotContext) => string }[] = [
+  // --- Optimization intents (Phase 3) — most specific first ---
+  {
+    match: /(what|which).*(vpp|system|ai).*(optimi|coordinat|decide|did.*today)|optimi[sz]e.*today/i,
+    answer: (ctx) => {
+      const c = ctx.comparison;
+      const byWindow = ctx.decisions
+        .slice(0, 6)
+        .map((d) => `${d.windowLabel}: ${d.title.toLowerCase()}`)
+        .join("; ");
+      return (
+        `Today the VPP executed ${ctx.decisions.length} coordinated actions: ${byWindow}. ` +
+        `Net result vs uncoordinated operation: peak demand down ${c.peakDemandReductionPct.toFixed(0)}% (${formatKw(c.peakDemandReductionKw)}), grid imports down ${formatKwh(c.gridImportReductionKwh)}, ` +
+        `renewable utilization up from ${c.renewablePctBefore.toFixed(0)}% to ${c.renewablePctAfter.toFixed(0)}%, saving ${formatUsd(c.costSavedUsd)} and ${formatKg(c.carbonSavedKg)} of CO₂.`
+      );
+    },
+  },
+  {
+    match: /why.*batter.*(discharg|drain|6\s?pm|evening|peak)|batter.*why.*discharg/i,
+    answer: (ctx) => {
+      const d = ctx.decisions.find((dec) => dec.type === "battery_discharge");
+      if (!d) return "The battery hasn't run a discharge cycle today — renewables covered the peak without storage support.";
+      return (
+        `The battery discharged during ${d.windowLabel} as a deliberate peak-shaving move. ${d.reason} ` +
+        `Averaging ${formatKw(d.avgKw)} of discharge, it cut peak grid import by ${formatKw(ctx.comparison.peakImportReductionKw)} (${ctx.comparison.peakImportReductionPct.toFixed(0)}%) versus the uncoordinated baseline.`
+      );
+    },
+  },
+  {
+    match: /(how much|what).*(peak).*(reduc|shav|cut|lower)|peak.*(reduc|shav).*(how|much)/i,
+    answer: (ctx) => {
+      const c = ctx.comparison;
+      return (
+        `Peak demand was cut from ${formatKw(c.before.peakDemandKw)} to ${formatKw(c.after.peakDemandKw)} — down ${c.peakDemandReductionPct.toFixed(0)}% (${formatKw(c.peakDemandReductionKw)}). ` +
+        `Peak grid import fell even more: from ${formatKw(c.before.peakGridImportKw)} to ${formatKw(c.after.peakGridImportKw)} (-${c.peakImportReductionPct.toFixed(0)}%), thanks to battery discharge and shifting ${formatKwh(c.evShiftedKwh)} of EV charging out of the 4-9pm window.`
+      );
+    },
+  },
+  {
+    match: /why.*(ev|charging).*(delay|defer|shift|postpon)|ev.*(delay|shift).*why/i,
+    answer: (ctx) => {
+      const d = ctx.decisions.find((dec) => dec.type === "ev_delay");
+      const resume = ctx.decisions.find((dec) => dec.type === "ev_resume");
+      if (!d) return "No EV charging was delayed today — evening load stayed within safe limits.";
+      return (
+        `EV charging was delayed during ${d.windowLabel} (about ${formatKw(d.avgKw)} of flexible load). ${d.reason} ` +
+        (resume
+          ? `The deferred sessions ran at ${resume.windowLabel} on off-peak power instead. `
+          : "") +
+        `In total ${formatKwh(ctx.comparison.evShiftedKwh)} moved to cheaper, cleaner hours — drivers still get charged, the grid never sees the spike.`
+      );
+    },
+  },
+  {
+    match: /(biggest|largest|top|main).*(sav|win|impact|improvement)/i,
+    answer: (ctx) => {
+      const c = ctx.comparison;
+      const evSavings = ctx.comparison.evShiftedKwh * (0.34 - 0.11);
+      return (
+        `The single biggest lever today is battery peak-shaving: it cut peak grid import by ${formatKw(c.peakImportReductionKw)} during the $0.34/kWh window, which drives most of the ${formatUsd(c.costSavedUsd)} total saving. ` +
+        `Second is EV load shifting — ${formatKwh(c.evShiftedKwh)} moved off-peak, worth roughly ${formatUsd(evSavings)}. ` +
+        `The same actions avoided ${formatKg(c.carbonSavedKg)} of CO₂ by lifting renewable utilization from ${c.renewablePctBefore.toFixed(0)}% to ${c.renewablePctAfter.toFixed(0)}%.`
+      );
+    },
+  },
+  // --- Situational awareness intents (Phase 2) ---
   {
     match: /(why|what).*(demand|load).*(high|peak|rising|up)|demand.*(why|high)/i,
     answer: (ctx) => {
@@ -112,8 +187,9 @@ const INTENTS: { match: RegExp; answer: (ctx: CopilotContext) => string }[] = [
     match: /(cost|money|sav|dollar|\$)/i,
     answer: (ctx) => {
       const { costSavedUsd, peakDemandReductionKw, aiTotals, rawTotals } = ctx.data;
+      const netLabel = (v: number) => (v < 0 ? `a ${formatUsd(-v)} net credit` : `a ${formatUsd(v)} net cost`);
       return (
-        `AI dispatch has saved ${formatUsd(costSavedUsd)} today versus running the same fleet without optimization (${formatUsd(rawTotals.totalCostUsd)} unoptimized vs ${formatUsd(aiTotals.totalCostUsd)} optimized). ` +
+        `AI dispatch has saved ${formatUsd(costSavedUsd)} today versus running the same fleet without optimization (${netLabel(rawTotals.totalCostUsd)} unoptimized vs ${netLabel(aiTotals.totalCostUsd)} optimized, net of export credits). ` +
         `The savings come from charging the battery on midday solar surplus instead of buying $0.34/kWh on-peak power, plus cutting peak grid import by ${formatKw(peakDemandReductionKw)}.`
       );
     },

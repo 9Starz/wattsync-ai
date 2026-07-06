@@ -7,6 +7,7 @@ import { BatterySocGauge } from "@/components/dashboard/BatterySocGauge";
 import { AiRecommendationCard } from "@/components/dashboard/AiRecommendationCard";
 import { AlertCard } from "@/components/alerts/AlertCard";
 import { AiInsightsRow } from "@/components/dashboard/AiInsightsRow";
+import { VppOptimizationRow } from "@/components/dashboard/VppOptimizationRow";
 import { forecastNext24h } from "@/lib/forecasting";
 import { getRecommendations } from "@/lib/ai/recommendations";
 import { getActiveAlerts, getDashboardData, getNowHour } from "@/lib/simulation";
@@ -53,6 +54,8 @@ export default function DashboardPage() {
             trend={`-${formatKw(data.peakDemandReductionKw)} peak import`}
           />
         </div>
+
+        <VppOptimizationRow />
 
         <AiInsightsRow current={current} forecast={forecast} topRecommendation={recommendations[0]} />
 

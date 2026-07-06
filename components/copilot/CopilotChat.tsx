@@ -8,11 +8,12 @@ interface ChatMessage {
 }
 
 const SUGGESTED_PROMPTS = [
+  "What did the VPP optimize today?",
+  "Why did the battery discharge at 6pm?",
+  "Why was EV charging delayed?",
   "Why is demand high today?",
-  "What should we do before the 6pm peak?",
   "Which asset is underperforming?",
-  "How much renewable energy are we using?",
-  "What is the biggest risk today?",
+  "What is the biggest saving today?",
 ];
 
 const WELCOME: ChatMessage = {
