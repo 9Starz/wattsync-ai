@@ -55,3 +55,31 @@ export function Sidebar() {
     </aside>
   );
 }
+
+/** Compact horizontal nav for small screens, where the sidebar is hidden. */
+export function MobileNav() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="scrollbar-thin sticky top-0 z-20 flex gap-1 overflow-x-auto border-b border-border bg-background/95 px-3 py-2 backdrop-blur md:hidden">
+      {NAV_ITEMS.map((item) => {
+        const active = pathname === item.href || pathname?.startsWith(item.href + "/");
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={clsx(
+              "flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+              active
+                ? "border-accent-green-dim/50 bg-accent-green-dim/10 text-accent-green"
+                : "border-border text-muted hover:text-foreground"
+            )}
+          >
+            <span>{item.icon}</span>
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}

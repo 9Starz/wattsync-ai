@@ -1,50 +1,72 @@
 # WattSync AI — AI-Powered Virtual Power Plant
 
-**Competition track:** AI for Clean Energy — Smart Grid Integration · Clean Energy Asset Monitoring · Long-Term Yield Forecasting · Clean Energy Solutions
+**One dashboard that turns disconnected clean-energy assets into a coordinated Virtual Power Plant — and proves, with numbers, that AI coordination cuts cost, carbon, and peak grid stress.**
 
-## Problem
+**Competition tracks:** AI for Clean Energy — Smart Grid Integration · Clean Energy Asset Monitoring · Long-Term Yield Forecasting · Clean Energy Solutions
 
-Grid operators and industrial/campus energy managers juggle solar, wind, hydro, batteries, EV chargers, and building loads as disconnected systems. Nobody has a single view of the whole portfolio, so operators can't see peak-demand risk coming, can't tell which asset is underperforming, and end up buying expensive on-peak grid power that a coordinated system could have avoided.
+🔗 **Live demo:** deploy via Vercel (see below) · **Repo:** https://github.com/9Starz/wattsync-ai
 
-## Solution
+---
 
-WattSync AI is a Virtual Power Plant (VPP) dashboard that unifies every clean energy asset into one operating picture: live generation/demand, battery and EV optimization decisions, asset health monitoring, and an AI Copilot that can answer plain-English operator questions grounded in the live dashboard state.
+## The problem
 
-## How AI is used
+Industrial parks, campuses, and smart cities own solar farms, wind turbines, batteries, EV chargers, and smart buildings — but operate them as disconnected silos. Every asset behaves sensibly on its own, yet the system as a whole fails every evening: demand peaks exactly when solar collapses and grid power costs 3x. The result is avoidable on-peak imports, avoidable carbon, and avoidable cost — every single day.
 
-- **Forecasting** — rule-based (structured to be swapped for an ML model later) 24h/7-day generation and demand forecasting, peak-timing and surplus/shortage detection.
-- **Optimization** — a battery/EV/grid strategy engine that decides when to charge, discharge, delay EV charging, or export to the grid, with an explicit "before AI / after AI" comparison.
-- **Copilot** — an Anthropic Claude-powered chat assistant, grounded in the live dashboard data (assets, KPIs, alerts, optimization results), for natural-language operator Q&A.
+## The solution
+
+WattSync AI unifies the whole fleet into one Virtual Power Plant with four AI layers on top:
+
+| Layer | What it does | Where |
+|---|---|---|
+| **Forecasting** | Predicts the next 24h of generation & demand with confidence bands, peak timing, surplus/shortage windows, weather impact, and a grid-risk rating | `/forecast` |
+| **Recommendations** | Time-aware, grounded advice — each with a reason, expected impact, confidence score, and suggested action | `/dashboard` |
+| **Optimization** | A five-rule decision engine that coordinates battery, EV, and grid flows — and proves its value with a before/after comparison on identical inputs | `/optimization` |
+| **Copilot** | Plain-English operator Q&A grounded in the live fleet, forecast, and optimization state | `/copilot` |
+
+## The 60-second demo (`/demo`)
+
+1. **The 6pm problem** — buildings and EV chargers peak together as solar dies and power hits $0.34/kWh.
+2. **Three coordinated moves** — bank free midday renewables in the battery, shift flexible EV charging overnight, discharge the battery through the peak.
+3. **The measurable result** — on the same simulated day with identical assets and weather: **peak demand −8%, grid energy imported −34%, ~$1,300 saved, ~480 kg CO₂ avoided, renewable utilization 93% → 96%** (exact figures vary with each day's simulated weather).
+
+Every number on every page derives from one simulation source, so the story is internally consistent and auditable.
+
+## How the AI works (honestly)
+
+- **Simulation engine** (`lib/simulation/`) generates a realistic 24h day — solar/wind/hydro curves, building & EV demand, time-of-use prices, weather — in two variants: *raw* (assets uncoordinated) and *AI-optimized* (VPP-coordinated). Deterministic per calendar day, so demos are stable.
+- **Forecasting** (`lib/forecasting/`) is a rule-based persistence+physics model with horizon-widening confidence bands. It sits behind a single `forecastNext24h()` seam — swapping in a trained ML model touches one file, zero callers.
+- **Optimization** (`lib/optimization/`) expresses the five VPP rules (charge on surplus, discharge on peak, delay EVs under stress, export when full, import only when necessary) as a readable rules table, then derives an explainable decision timeline — every action has a time window, magnitude, and a WHY with real numbers.
+- **Copilot** (`lib/ai/copilot.ts`) is a deterministic reasoning engine: it routes operator questions to intent handlers that compute answers live from the same data the dashboard shows. An LLM provider seam (`answerQuestion()`) is in place for Claude/GPT/Gemini — the grounding context builder is already done, so the swap is one function.
+
+We deliberately labeled what is rule-based as rule-based. The value the judges see — forecasts, decisions, savings — is real computation over the simulated fleet, not canned strings.
 
 ## Tech stack
 
-- **Frontend:** Next.js (App Router) + Tailwind CSS + Recharts
-- **Backend:** Next.js API routes
-- **AI:** Anthropic Claude API
-- **Deployment:** Vercel
+Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · Recharts · deployed on Vercel. No database or API keys required — the whole demo runs from the in-process simulation, which makes it trivially deployable and impossible to break mid-demo.
 
-## Features (current build status)
+## Pages
 
-- [x] **Dashboard overview** — renewable generation, demand, battery SOC, EV load, grid import/export, carbon saved, cost saved, and an AI recommendation card, all backed by a simulated 24h data engine
-- [x] **Simulated data engine** — realistic solar/wind/hydro/demand/EV/price curves with a "raw" (no AI) and "AI-optimized" variant for every scenario
-- [x] **Asset monitoring alerts** — threshold-based detectors for low solar performance, battery degradation, EV peak load, wind abnormality, and grid stress
-- [ ] Asset inventory page, forecasting page, optimization timeline + before/after page, AI Copilot chat, and the scripted demo-story page are scaffolded as placeholders and land in the next build phases
+`/dashboard` — live KPIs, AI insights, optimization impact, energy mix & demand charts, alerts
+`/assets` — fleet inventory: capacity, live output, utilization, health scores, per-asset alerts
+`/forecast` — 24h generation/demand forecast with confidence bands, surplus/shortage, weather impact, grid risk
+`/optimization` — before/after KPI grid, grid-import comparison, battery & EV schedules, AI decision timeline
+`/copilot` — grounded operator Q&A with suggested prompts
+`/demo` — the scripted 60-second judge walkthrough
 
-## Demo scenario
-
-At 6pm, building and EV charging demand ramp up together. Without AI, the system has to import expensive on-peak grid electricity. With AI, the battery is pre-charged earlier in the day from renewable surplus, a portion of EV charging is delayed out of the peak window, and the battery discharges during the 4-9pm peak — cutting grid import, cost, and carbon emissions while raising renewable utilization. The dashboard's "Carbon Saved" / "Cost Saved" KPIs and AI Recommendation card reflect this comparison live.
-
-## Installation
+## Run it
 
 ```bash
 npm install
-npm run dev
+npm run dev     # http://localhost:3000 → redirects to /dashboard
+npm run build   # production build (used by Vercel)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) — it redirects to `/dashboard`.
+Deploy: import the repo at [vercel.com/new](https://vercel.com/new) — zero configuration needed.
 
-```bash
-npm run build   # production build, used for Vercel deploys
-```
+## Roadmap to production
 
-No environment variables or database are required for the current dashboard build — all data comes from an in-process simulation engine (`lib/simulation/`). A future phase wires this up to Supabase and the Anthropic API for the Copilot.
+1. **Real data ingestion** — replace the simulation seam with SCADA/meter/inverter feeds (the `raw` variant becomes telemetry).
+2. **ML forecasting** — swap `forecastNext24h()` for a trained model on weather + calendar features.
+3. **LLM Copilot** — activate the Claude provider behind the existing seam for free-form reasoning.
+4. **Persistence & multi-tenant** — Supabase/Postgres schema (designed) for fleets, time series, and decision audit logs.
+5. **Dispatch integration** — close the loop from recommendation to actual battery/EVSE control via OpenADR/OCPP.
