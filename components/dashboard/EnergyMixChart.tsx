@@ -12,7 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import { IntervalPoint } from "@/lib/simulation";
-import { formatHourLabel, formatKw } from "@/lib/utils/format";
+import { formatAxisKw, formatHourLabel, formatKw } from "@/lib/utils/format";
 
 export function EnergyMixChart({ points, nowHour }: { points: IntervalPoint[]; nowHour: number }) {
   const data = points.map((p) => ({
@@ -24,7 +24,7 @@ export function EnergyMixChart({ points, nowHour }: { points: IntervalPoint[]; n
 
   return (
     <ResponsiveContainer width="100%" height={260}>
-      <AreaChart data={data} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
+      <AreaChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="solarGradient" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#fbbf24" stopOpacity={0.55} />
@@ -50,9 +50,10 @@ export function EnergyMixChart({ points, nowHour }: { points: IntervalPoint[]; n
           fontSize={11}
           tickLine={false}
         />
-        <YAxis stroke="#8ca0b8" fontSize={11} tickLine={false} tickFormatter={(v) => `${v}`} width={48} />
+        <YAxis stroke="#8ca0b8" fontSize={11} tickLine={false} tickFormatter={formatAxisKw} width={52} />
         <Tooltip
           contentStyle={{ background: "#131c2a", border: "1px solid #223047", borderRadius: 8, fontSize: 12 }}
+          labelStyle={{ color: "#e7edf5" }}
           labelFormatter={(h) =>
             `${formatHourLabel(h as number)}${(h as number) > nowHour ? " · AI projection" : ""}`
           }

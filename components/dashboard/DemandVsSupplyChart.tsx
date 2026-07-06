@@ -12,7 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import { IntervalPoint } from "@/lib/simulation";
-import { formatHourLabel, formatKw } from "@/lib/utils/format";
+import { formatAxisKw, formatHourLabel, formatKw } from "@/lib/utils/format";
 
 export function DemandVsSupplyChart({ points, nowHour }: { points: IntervalPoint[]; nowHour: number }) {
   const data = points.map((p) => ({
@@ -24,7 +24,7 @@ export function DemandVsSupplyChart({ points, nowHour }: { points: IntervalPoint
 
   return (
     <ResponsiveContainer width="100%" height={260}>
-      <LineChart data={data} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
+      <LineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#223047" vertical={false} />
         <XAxis
           dataKey="hour"
@@ -36,9 +36,10 @@ export function DemandVsSupplyChart({ points, nowHour }: { points: IntervalPoint
           fontSize={11}
           tickLine={false}
         />
-        <YAxis stroke="#8ca0b8" fontSize={11} tickLine={false} width={48} />
+        <YAxis stroke="#8ca0b8" fontSize={11} tickLine={false} tickFormatter={formatAxisKw} width={52} />
         <Tooltip
           contentStyle={{ background: "#131c2a", border: "1px solid #223047", borderRadius: 8, fontSize: 12 }}
+          labelStyle={{ color: "#e7edf5" }}
           labelFormatter={(h) =>
             `${formatHourLabel(h as number)}${(h as number) > nowHour ? " · AI projection" : ""}`
           }

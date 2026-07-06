@@ -21,6 +21,16 @@ export function formatPct(value: number): string {
   return `${value.toFixed(0)}%`;
 }
 
+/** Compact axis-tick label for kW values: 2500 -> "2.5MW", 800 -> "800", 0 -> "0". */
+export function formatAxisKw(value: number): string {
+  if (value === 0) return "0";
+  if (Math.abs(value) >= 1000) {
+    const mw = value / 1000;
+    return `${Number.isInteger(mw) ? mw : mw.toFixed(1)}MW`;
+  }
+  return `${value}`;
+}
+
 export function formatHourLabel(hour: number): string {
   const h = Math.floor(hour) % 24;
   const m = Math.round((hour - Math.floor(hour)) * 60);
