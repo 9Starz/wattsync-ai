@@ -71,7 +71,7 @@ export function BeforeAfterKpiGrid({ comparison }: { comparison: OptimizationCom
           <div className="mt-2 space-y-1 text-sm tabular-nums">
             <p className="text-muted">
               <span className="mr-1.5 text-[10px] uppercase">Before</span>
-              <span className="line-through decoration-critical/60">{r.before}</span>
+              {r.before}
             </p>
             <p className="text-lg font-semibold text-foreground">
               <span className="mr-1.5 text-[10px] font-normal uppercase text-muted">After</span>
