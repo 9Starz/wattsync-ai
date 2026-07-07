@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { answerQuestion } from "@/lib/ai/copilot";
+import { CopilotChatMessage } from "@/lib/ai/claudeProvider";
 
 export const dynamic = "force-dynamic";
 
 /**
  * Copilot chat endpoint. Accepts { messages: [{role, content}, ...] } and answers the
- * latest user message grounded in live simulation + forecast + recommendation data.
- * The answer engine behind this route is swappable (rule-based today, LLM later).
+ * latest user message grounded in live simulation + forecast + optimization data.
+ * Engine: Claude (when ANTHROPIC_API_KEY is set server-side) with a deterministic
+ * rule-based fallback. Responds { reply, mode: "claude" | "rules" }.
  */
 export async function POST(request: Request) {
   let body: unknown;
@@ -16,15 +18,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const messages = (body as { messages?: { role?: string; content?: string }[] })?.messages;
-  const lastUser = Array.isArray(messages)
-    ? [...messages].reverse().find((m) => m?.role === "user" && typeof m?.content === "string")
-    : undefined;
+  const raw = (body as { messages?: { role?: string; content?: string }[] })?.messages;
+  const history: CopilotChatMessage[] = Array.isArray(raw)
+    ? raw
+        .filter(
+          (m): m is { role: "user" | "assistant"; content: string } =>
+            (m?.role === "user" || m?.role === "assistant") && typeof m?.content === "string"
+        )
+        .map((m) => ({ role: m.role, content: m.content }))
+    : [];
 
-  if (!lastUser?.content?.trim()) {
+  const lastUser = [...history].reverse().find((m) => m.role === "user");
+  if (!lastUser?.content.trim()) {
     return NextResponse.json({ error: "No user message provided" }, { status: 400 });
   }
 
-  const reply = answerQuestion(lastUser.content);
-  return NextResponse.json({ reply });
+  const { reply, mode } = await answerQuestion(lastUser.content, history);
+  return NextResponse.json({ reply, mode });
 }

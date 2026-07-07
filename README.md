@@ -36,7 +36,7 @@ Every number on every page derives from one simulation source, so the story is i
 - **Simulation engine** (`lib/simulation/`) generates a realistic 24h day — solar/wind/hydro curves, building & EV demand, time-of-use prices, weather — in two variants: *raw* (assets uncoordinated) and *AI-optimized* (VPP-coordinated). Deterministic per calendar day, so demos are stable.
 - **Forecasting** (`lib/forecasting/`) is a rule-based persistence+physics model with horizon-widening confidence bands. It sits behind a single `forecastNext24h()` seam — swapping in a trained ML model touches one file, zero callers.
 - **Optimization** (`lib/optimization/`) expresses the five VPP rules (charge on surplus, discharge on peak, delay EVs under stress, export when full, import only when necessary) as a readable rules table, then derives an explainable decision timeline — every action has a time window, magnitude, and a WHY with real numbers.
-- **Copilot** (`lib/ai/copilot.ts`) is a deterministic reasoning engine: it routes operator questions to intent handlers that compute answers live from the same data the dashboard shows. An LLM provider seam (`answerQuestion()`) is in place for Claude/GPT/Gemini — the grounding context builder is already done, so the swap is one function.
+- **Copilot** (`lib/ai/copilot.ts` + `lib/ai/claudeProvider.ts`) answers operator questions grounded in the same live data the dashboard shows. With `ANTHROPIC_API_KEY` set (server-side env var, never exposed to the browser) it calls **Anthropic Claude** with the full fleet snapshot as grounding context; without a key — or if the API call fails or times out — a deterministic intent-routing rule engine answers from the same data, so the demo can never break mid-pitch. The UI labels every reply with the engine that produced it.
 
 We deliberately labeled what is rule-based as rule-based. The value the judges see — forecasts, decisions, savings — is real computation over the simulated fleet, not canned strings.
 
@@ -61,12 +61,14 @@ npm run dev     # http://localhost:3000 → redirects to /dashboard
 npm run build   # production build (used by Vercel)
 ```
 
+Optional — Claude-powered Copilot: copy `.env.example` to `.env.local` and set `ANTHROPIC_API_KEY` (on Vercel: Project Settings → Environment Variables). Without a key the copilot runs on its deterministic rule engine; nothing else changes.
+
 Deploy: import the repo at [vercel.com/new](https://vercel.com/new) — zero configuration needed.
 
 ## Roadmap to production
 
 1. **Real data ingestion** — replace the simulation seam with SCADA/meter/inverter feeds (the `raw` variant becomes telemetry).
 2. **ML forecasting** — swap `forecastNext24h()` for a trained model on weather + calendar features.
-3. **LLM Copilot** — activate the Claude provider behind the existing seam for free-form reasoning.
+3. **Copilot memory & actions** — the Claude provider is live (see above); next: persistent conversation history and closing the loop from answer to dispatch action.
 4. **Persistence & multi-tenant** — Supabase/Postgres schema (designed) for fleets, time series, and decision audit logs.
 5. **Dispatch integration** — close the loop from recommendation to actual battery/EVSE control via OpenADR/OCPP.

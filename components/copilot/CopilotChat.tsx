@@ -5,6 +5,8 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+  /** Which engine answered: "claude" = AI-powered, "rules" = deterministic fallback. */
+  mode?: "claude" | "rules";
 }
 
 const SUGGESTED_PROMPTS = [
@@ -47,8 +49,8 @@ export function CopilotChat() {
         body: JSON.stringify({ messages: nextMessages }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const { reply } = (await res.json()) as { reply: string };
-      setMessages((m) => [...m, { role: "assistant", content: reply }]);
+      const { reply, mode } = (await res.json()) as { reply: string; mode?: "claude" | "rules" };
+      setMessages((m) => [...m, { role: "assistant", content: reply, mode }]);
     } catch {
       setMessages((m) => [
         ...m,
@@ -121,6 +123,16 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         {!isUser && (
           <p className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-accent-green">
             <span>✦</span> Copilot
+            {message.mode === "claude" && (
+              <span className="rounded-full border border-accent-green-dim/40 bg-accent-green-dim/10 px-1.5 py-px text-[9px] font-medium normal-case tracking-normal text-accent-green">
+                AI-powered · Claude
+              </span>
+            )}
+            {message.mode === "rules" && (
+              <span className="rounded-full border border-border bg-surface-raised/60 px-1.5 py-px text-[9px] font-medium normal-case tracking-normal text-muted">
+                fallback · rule engine
+              </span>
+            )}
           </p>
         )}
         {message.content}

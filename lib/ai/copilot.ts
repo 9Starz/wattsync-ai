@@ -15,6 +15,7 @@ import {
   getNowHour,
 } from "@/lib/simulation";
 import { formatHourLabel, formatKg, formatKw, formatKwh, formatUsd, formatUsdPerYear } from "@/lib/utils/format";
+import { answerWithClaude, CopilotChatMessage, isClaudeConfigured } from "./claudeProvider";
 import { getRecommendations, Recommendation } from "./recommendations";
 
 /** Everything the copilot can ground an answer in — one snapshot per question. */
@@ -315,23 +316,45 @@ function fallbackAnswer(ctx: CopilotContext): string {
   );
 }
 
-/**
- * Provider seam. Today this always routes to the rule-based engine; when an LLM key is
- * configured, swap the branch below for a real API call that passes buildContext() as
- * grounding data. The function signature stays identical either way.
- *
- * TODO(phase-4): add an Anthropic Claude provider —
- *   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
- *   stream a messages.create() call with JSON.stringify(ctx) in the system prompt.
- *   (OpenAI GPT / Google Gemini would slot in the same way behind this seam.)
- */
-export function answerQuestion(question: string): string {
-  const ctx = buildContext();
-
-  // if (process.env.ANTHROPIC_API_KEY) return answerWithClaude(question, ctx);  // future LLM path
-
+/** Deterministic engine: intent-route the question against the live context. */
+function answerWithRules(question: string, ctx: CopilotContext): string {
   for (const intent of INTENTS) {
     if (intent.match.test(question)) return intent.answer(ctx, question);
   }
   return fallbackAnswer(ctx);
+}
+
+export type CopilotMode = "claude" | "rules";
+
+export interface CopilotAnswer {
+  reply: string;
+  /** Which engine produced the reply — surfaced in the UI as AI-powered vs fallback. */
+  mode: CopilotMode;
+}
+
+/**
+ * Provider seam. When ANTHROPIC_API_KEY is configured (server-side env var only),
+ * questions go to Claude grounded in the same live context the dashboard renders.
+ * If the key is missing, the call fails, or it times out, the deterministic rule
+ * engine answers instead — the demo can never break mid-pitch.
+ */
+export async function answerQuestion(
+  question: string,
+  history?: CopilotChatMessage[]
+): Promise<CopilotAnswer> {
+  const ctx = buildContext();
+
+  if (isClaudeConfigured()) {
+    try {
+      const reply = await answerWithClaude(
+        history?.length ? history : [{ role: "user", content: question }],
+        JSON.stringify(ctx)
+      );
+      return { reply, mode: "claude" };
+    } catch (err) {
+      console.error("[copilot] Claude call failed; answering with rule engine:", err);
+    }
+  }
+
+  return { reply: answerWithRules(question, ctx), mode: "rules" };
 }
