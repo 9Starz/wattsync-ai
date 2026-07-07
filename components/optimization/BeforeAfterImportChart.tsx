@@ -60,8 +60,9 @@ export function BeforeAfterImportChart({
           fillOpacity={0.06}
           label={{ value: "on-peak $0.34/kWh", position: "insideTop", fill: "#fbbf24", fontSize: 10 }}
         />
-        <Line type="monotone" dataKey="Before AI" stroke="#f87171" strokeWidth={2} strokeDasharray="5 4" dot={false} />
-        <Line type="monotone" dataKey="After AI" stroke="#34d399" strokeWidth={2} dot={false} />
+        {/* No draw-in animation: this chart is the demo's money shot and must be complete the instant the page paints */}
+        <Line type="monotone" dataKey="Before AI" stroke="#f87171" strokeWidth={2} strokeDasharray="5 4" dot={false} isAnimationActive={false} />
+        <Line type="monotone" dataKey="After AI" stroke="#34d399" strokeWidth={2} dot={false} isAnimationActive={false} />
       </LineChart>
     </ResponsiveContainer>
   );
