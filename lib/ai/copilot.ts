@@ -48,7 +48,7 @@ function buildContext(): CopilotContext {
  * intents first). This is the "smart rule-based copilot" — an LLM provider can replace
  * answerQuestion() wholesale (see provider seam below) without touching the UI or API route.
  */
-const INTENTS: { match: RegExp; answer: (ctx: CopilotContext) => string }[] = [
+const INTENTS: { match: RegExp; answer: (ctx: CopilotContext, question: string) => string }[] = [
   // --- Optimization intents (Phase 3) — most specific first ---
   {
     match: /(what|which).*(vpp|system|ai).*(optimi|coordinat|decide|did.*today)|optimi[sz]e.*today/i,
@@ -158,6 +158,61 @@ const INTENTS: { match: RegExp; answer: (ctx: CopilotContext) => string }[] = [
     },
   },
   {
+    // Asset health / utilization questions — "utilization shows 0%?", "health score 89 — what happened?"
+    match: /(health\s*score|utili[sz]ation|capacity\s*fade|degrad)/i,
+    answer: (ctx, question) => {
+      const q = question.toLowerCase();
+      const TYPE_KEYWORDS: [RegExp, Asset["type"]][] = [
+        [/battery|storage/, "battery_storage"],
+        [/solar/, "solar_farm"],
+        [/wind|turbine/, "wind_turbine"],
+        [/hydro/, "hydro_plant"],
+        [/\bev\b|charg/, "ev_charging_station"],
+        [/building/, "smart_building"],
+      ];
+      const matchedType = TYPE_KEYWORDS.find(([re]) => re.test(q))?.[1];
+      const asset =
+        ctx.assets.find((a) => q.includes(a.name.toLowerCase())) ??
+        (matchedType ? ctx.assets.find((a) => a.type === matchedType) : undefined);
+
+      if (!asset) {
+        const worst = [...ctx.assets].sort((a, b) => a.healthScore - b.healthScore)[0];
+        const avg = Math.round(ctx.assets.reduce((s, a) => s + a.healthScore, 0) / ctx.assets.length);
+        return (
+          `Fleet health averages ${avg}/100 across ${ctx.assets.length} assets; the lowest is ${worst.name} at ${worst.healthScore}/100. ` +
+          `Utilization measures how much of an asset's capacity is flowing right now; health score tracks its long-term condition from monitoring. Ask about a specific asset for details.`
+        );
+      }
+
+      const alert = ctx.alerts.find((al) => al.assetId === asset.id);
+      const util = Math.round((asset.currentOutputKw / asset.capacityKw) * 100);
+
+      if (asset.type === "battery_storage") {
+        const soc = Math.round(ctx.data.current.batterySocPercent);
+        const flow = ctx.data.current.batteryFlowKw;
+        const state =
+          flow > 10
+            ? `charging at ${formatKw(flow)}`
+            : flow < -10
+              ? `discharging at ${formatKw(Math.abs(flow))}`
+              : "idle — holding its stored energy rather than charging or discharging";
+        return (
+          `Those are two different measurements, and both are correct. Utilization is the power flowing through the battery right now: it reads ${util}% because the battery is ${state}. ` +
+          `State of charge — how full it is — sits at ${soc}%. Health score (${asset.healthScore}/100) tracks long-term condition, not today's activity. ` +
+          (alert
+            ? `The score reflects an active alert: ${alert.cause} Recommended action: ${alert.recommendedAction}`
+            : `No active alerts on it.`)
+        );
+      }
+
+      return (
+        `${asset.name} is running at ${util}% utilization (${formatKw(asset.currentOutputKw)} of ${formatKw(asset.capacityKw)} capacity) with a health score of ${asset.healthScore}/100. ` +
+        `Utilization reflects this moment — weather and time of day — while health score tracks the asset's long-term condition. ` +
+        (alert ? `Active alert: ${alert.cause} Recommended action: ${alert.recommendedAction}` : `No active alerts on it.`)
+      );
+    },
+  },
+  {
     match: /(how much|what).*(renewable|clean|green).*(us|share|percent|using)|renewable.*(percent|share|much)/i,
     answer: (ctx) => {
       const { aiTotals, rawTotals, current } = ctx.data;
@@ -215,9 +270,12 @@ const INTENTS: { match: RegExp; answer: (ctx: CopilotContext) => string }[] = [
             ? `discharging at ${formatKw(Math.abs(current.batteryFlowKw))}`
             : "idle";
       const rec = ctx.recommendations.find((r) => r.id === "rec-discharge-peak" || r.id === "rec-charge-midday");
+      const battery = ctx.assets.find((a) => a.type === "battery_storage");
+      const alert = battery && ctx.alerts.find((al) => al.assetId === battery.id);
       return (
         `The Central Battery Array is at ${Math.round(current.batterySocPercent)}% state of charge and currently ${flow}. ` +
-        (rec ? `Next move: ${rec.action}` : "No battery action is scheduled — SOC is where the optimizer wants it.")
+        (rec ? `Next move: ${rec.action}` : "No battery action is scheduled — SOC is where the optimizer wants it.") +
+        (alert ? ` Note: ${alert.cause}` : "")
       );
     },
   },
@@ -272,7 +330,7 @@ export function answerQuestion(question: string): string {
   // if (process.env.ANTHROPIC_API_KEY) return answerWithClaude(question, ctx);  // future LLM path
 
   for (const intent of INTENTS) {
-    if (intent.match.test(question)) return intent.answer(ctx);
+    if (intent.match.test(question)) return intent.answer(ctx, question);
   }
   return fallbackAnswer(ctx);
 }
