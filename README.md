@@ -2,7 +2,7 @@
 
 **One dashboard that turns disconnected clean-energy assets into a coordinated Virtual Power Plant — and proves, with numbers, that AI coordination cuts cost, carbon, and peak grid stress.**
 
-**Competition tracks:** AI for Clean Energy — Smart Grid Integration · Clean Energy Asset Monitoring · Long-Term Yield Forecasting · Clean Energy Solutions
+**Competition tracks — all five AI for Clean Energy focus areas covered:** Project Development Intelligence (`/development`) · Smart Grid Integration (`/optimization`) · Clean Energy Asset Monitoring (`/assets`, `/dashboard`) · Long-Term Yield Forecasting (`/forecast`, `/development`) · Clean Energy Solutions (`/demo`, `/copilot`)
 
 ## ⚡ Judging in a hurry? 60 seconds:
 
@@ -23,6 +23,7 @@ WattSync AI unifies the whole fleet into one Virtual Power Plant with four AI la
 
 | Layer | What it does | Where |
 |---|---|---|
+| **Development** | Screens candidate sites for the next asset (resource, interconnection, permitting, land), models yield & economics, and shows what today's live fleet would look like with the new asset online | `/development` |
 | **Forecasting** | Predicts the next 24h of generation & demand with confidence bands, peak timing, surplus/shortage windows, weather impact, and a grid-risk rating | `/forecast` |
 | **Recommendations** | Time-aware, grounded advice — each with a reason, expected impact, confidence score, and suggested action | `/dashboard` |
 | **Optimization** | A five-rule decision engine that coordinates battery, EV, and grid flows — and proves its value with a before/after comparison on identical inputs | `/optimization` |
@@ -43,6 +44,7 @@ Every number on every page derives from one simulation source, so the story is i
 | **Dashboard** — live KPIs, AI insights, optimization impact ![Dashboard](docs/screenshots/dashboard.png) | **Demo Story** — the 3-act judge walkthrough ![Demo Story](docs/screenshots/demo.png) |
 | **Optimization** — before/after on identical inputs, decision timeline ![Optimization](docs/screenshots/optimization.png) | **Forecast** — 24h generation & demand with confidence bands ![Forecast](docs/screenshots/forecast.png) |
 | **AI Copilot** — grounded operator Q&A (Claude + rule-engine fallback) ![Copilot](docs/screenshots/copilot.png) | **Assets** — fleet inventory with utilization & health ![Assets](docs/screenshots/assets.png) |
+| **Development** — site screening, feasibility, VPP integration impact ![Development](docs/screenshots/development.png) | |
 
 ## How the AI works (honestly)
 
@@ -60,6 +62,7 @@ Next.js 16 (App Router) · TypeScript · Tailwind CSS 4 · Recharts · deployed 
 ## Pages
 
 `/dashboard` — live KPIs, AI insights, optimization impact, energy mix & demand charts, alerts
+`/development` — site screening, feasibility economics, VPP integration impact, development roadmap
 `/assets` — fleet inventory: capacity, live output, utilization, health scores, per-asset alerts
 `/forecast` — 24h generation/demand forecast with confidence bands, surplus/shortage, weather impact, grid risk
 `/optimization` — before/after KPI grid, grid-import comparison, battery & EV schedules, AI decision timeline
