@@ -4,7 +4,7 @@ import { SectionCard } from "@/components/shared/SectionCard";
 import { BeforeAfterImportChart } from "@/components/optimization/BeforeAfterImportChart";
 import { getOptimizationComparison, getOptimizationDecisions } from "@/lib/optimization";
 import { getTodaySeries } from "@/lib/simulation";
-import { formatHourLabel, formatKg, formatKw, formatKwh, formatUsd } from "@/lib/utils/format";
+import { formatHourLabel, formatKg, formatKw, formatKwh, formatUsd, formatUsdPerYear } from "@/lib/utils/format";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +45,7 @@ export default function DemoPage() {
   const results = [
     { label: "Peak Demand", value: `-${comparison.peakDemandReductionPct.toFixed(0)}%`, hint: `${formatKw(comparison.peakDemandReductionKw)} shaved` },
     { label: "Grid Energy Imported", value: `-${comparison.gridImportReductionPct.toFixed(0)}%`, hint: `${formatKwh(comparison.gridImportReductionKwh)} avoided` },
-    { label: "Cost Saved", value: formatUsd(comparison.costSavedUsd), hint: "vs uncoordinated, today" },
+    { label: "Cost Saved", value: formatUsd(comparison.costSavedUsd), hint: `≈ ${formatUsdPerYear(comparison.costSavedUsd)} annualized run-rate` },
     { label: "CO₂ Avoided", value: formatKg(comparison.carbonSavedKg), hint: `renewables ${comparison.renewablePctBefore.toFixed(0)}% → ${comparison.renewablePctAfter.toFixed(0)}%` },
   ];
 
@@ -118,7 +118,8 @@ export default function DemoPage() {
           <p className="max-w-3xl text-sm leading-relaxed text-muted">
             <span className="font-medium text-foreground">
               WattSync AI turned {decisions.length} coordinated decisions into {formatUsd(comparison.costSavedUsd)} of
-              savings, {formatKg(comparison.carbonSavedKg)} of avoided CO₂, and a{" "}
+              savings — an annualized run-rate of ≈{formatUsdPerYear(comparison.costSavedUsd).replace("/yr", " a year")}{" "}
+              from this single site — plus {formatKg(comparison.carbonSavedKg)} of avoided CO₂ and a{" "}
               {comparison.peakDemandReductionPct.toFixed(0)}% lower peak
             </span>{" "}
             — using the exact same assets, weather, and demand. Explore the{" "}

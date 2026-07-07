@@ -14,7 +14,7 @@ import {
   getLiveAssets,
   getNowHour,
 } from "@/lib/simulation";
-import { formatHourLabel, formatKg, formatKw, formatKwh, formatUsd } from "@/lib/utils/format";
+import { formatHourLabel, formatKg, formatKw, formatKwh, formatUsd, formatUsdPerYear } from "@/lib/utils/format";
 import { getRecommendations, Recommendation } from "./recommendations";
 
 /** Everything the copilot can ground an answer in — one snapshot per question. */
@@ -245,7 +245,8 @@ const INTENTS: { match: RegExp; answer: (ctx: CopilotContext, question: string) 
       const netLabel = (v: number) => (v < 0 ? `a ${formatUsd(-v)} net credit` : `a ${formatUsd(v)} net cost`);
       return (
         `AI dispatch has saved ${formatUsd(costSavedUsd)} today versus running the same fleet without optimization (${netLabel(rawTotals.totalCostUsd)} unoptimized vs ${netLabel(aiTotals.totalCostUsd)} optimized, net of export credits). ` +
-        `The savings come from charging the battery on midday solar surplus instead of buying $0.34/kWh on-peak power, plus cutting peak grid import by ${formatKw(peakDemandReductionKw)}.`
+        `The savings come from charging the battery on midday solar surplus instead of buying $0.34/kWh on-peak power, plus cutting peak grid import by ${formatKw(peakDemandReductionKw)}. ` +
+        `At today's rate that is an annualized run-rate of roughly ${formatUsdPerYear(costSavedUsd)} for this single site.`
       );
     },
   },

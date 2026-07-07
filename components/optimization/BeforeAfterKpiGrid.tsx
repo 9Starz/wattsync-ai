@@ -1,5 +1,5 @@
 import { OptimizationComparison } from "@/lib/optimization";
-import { formatKg, formatKw, formatKwh, formatUsd } from "@/lib/utils/format";
+import { formatKg, formatKw, formatKwh, formatUsd, formatUsdPerYear } from "@/lib/utils/format";
 
 interface Row {
   label: string;
@@ -51,7 +51,7 @@ export function BeforeAfterKpiGrid({ comparison }: { comparison: OptimizationCom
       label: "Net Energy Cost",
       before: formatNetCost(c.before.totalCostUsd),
       after: formatNetCost(c.after.totalCostUsd),
-      delta: `${formatUsd(c.costSavedUsd)} saved`,
+      delta: `${formatUsd(c.costSavedUsd)} · ≈${formatUsdPerYear(c.costSavedUsd)}`,
       good: c.costSavedUsd > 0,
     },
     {

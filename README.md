@@ -27,7 +27,7 @@ WattSync AI unifies the whole fleet into one Virtual Power Plant with four AI la
 
 1. **The 6pm problem** — buildings and EV chargers peak together as solar dies and power hits $0.34/kWh.
 2. **Three coordinated moves** — bank free midday renewables in the battery, shift flexible EV charging overnight, discharge the battery through the peak.
-3. **The measurable result** — on the same simulated day with identical assets and weather: **peak demand −8%, grid energy imported −34%, ~$1,300 saved, ~480 kg CO₂ avoided, renewable utilization 93% → 96%** (exact figures vary with each day's simulated weather).
+3. **The measurable result** — on the same simulated day with identical assets and weather: **peak demand −8%, grid energy imported −34%, ~$1,300 saved (an annualized run-rate of ≈$470K from one site), ~480 kg CO₂ avoided, renewable utilization 93% → 96%** (exact figures vary with each day's simulated weather).
 
 Every number on every page derives from one simulation source, so the story is internally consistent and auditable.
 

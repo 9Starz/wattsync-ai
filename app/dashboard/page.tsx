@@ -11,7 +11,7 @@ import { VppOptimizationRow } from "@/components/dashboard/VppOptimizationRow";
 import { forecastNext24h } from "@/lib/forecasting";
 import { getRecommendations } from "@/lib/ai/recommendations";
 import { getActiveAlerts, getDashboardData, getNowHour } from "@/lib/simulation";
-import { formatHourLabel, formatKg, formatKw, formatPct, formatUsd } from "@/lib/utils/format";
+import { formatHourLabel, formatKg, formatKw, formatPct, formatUsd, formatUsdPerYear } from "@/lib/utils/format";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +51,8 @@ export default function DashboardPage() {
             label="Cost Saved (AI vs. no AI, today)"
             value={formatUsd(data.costSavedUsd)}
             accent="green"
-            trend={`-${formatKw(data.peakDemandReductionKw)} peak import`}
+            trend={`≈ ${formatUsdPerYear(data.costSavedUsd)} run-rate`}
+            hint={`-${formatKw(data.peakDemandReductionKw)} peak import`}
           />
         </div>
 
