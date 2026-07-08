@@ -13,9 +13,16 @@
 
 ---
 
+## Built for Malaysia 🇲🇾
+
+WattSync AI is a **Malaysia-first clean-energy platform**, modelled on Malaysia's own renewable ecosystem and the national push toward 70% renewable capacity by 2050. The demo fleet spans real Malaysian sites — a **Large Scale Solar (LSS)** park in Kedah, the **Bakun** hydro plant in Sarawak, a **Cyberjaya** battery energy storage system, **Putrajaya** EV fast charging, the **TRX** smart commercial district, and a **Kudat** small-wind pilot — with development screening across Kedah, Selangor, Sarawak and beyond, referencing local frameworks (TNB interconnection, DOE environmental screening, NEM 3.0).
+
+- **Primary mix:** Solar PV · Hydro · Battery Energy Storage · EV infrastructure · Smart buildings
+- **Secondary / emerging:** Small wind pilots (Kudat) · Biomass — the platform scales to these as the fleet grows
+
 ## The problem
 
-Industrial parks, campuses, and smart cities own solar farms, wind turbines, batteries, EV chargers, and smart buildings — but operate them as disconnected silos. Every asset behaves sensibly on its own, yet the system as a whole fails every evening: demand peaks exactly when solar collapses and grid power costs 3x. The result is avoidable on-peak imports, avoidable carbon, and avoidable cost — every single day.
+Industrial parks, campuses, and smart cities across Malaysia own solar farms, hydro, batteries, EV chargers, and smart buildings — but operate them as disconnected silos. Every asset behaves sensibly on its own, yet the system as a whole fails every evening: demand peaks exactly when solar collapses and grid power costs 3x. The result is avoidable on-peak imports, avoidable carbon, and avoidable cost — every single day.
 
 ## The solution
 

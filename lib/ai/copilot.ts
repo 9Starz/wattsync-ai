@@ -275,7 +275,7 @@ const INTENTS: { match: RegExp; answer: (ctx: CopilotContext, question: string) 
       const battery = ctx.assets.find((a) => a.type === "battery_storage");
       const alert = battery && ctx.alerts.find((al) => al.assetId === battery.id);
       return (
-        `The Central Battery Array is at ${Math.round(current.batterySocPercent)}% state of charge and currently ${flow}. ` +
+        `The ${battery?.name ?? "battery array"} is at ${Math.round(current.batterySocPercent)}% state of charge and currently ${flow}. ` +
         (rec ? `Next move: ${rec.action}` : "No battery action is scheduled — SOC is where the optimizer wants it.") +
         (alert ? ` Note: ${alert.cause}` : "")
       );

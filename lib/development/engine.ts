@@ -136,7 +136,7 @@ export function getFeasibility(site: CandidateSite): FeasibilityReport {
 
 // --- VPP integration impact -----------------------------------------------------
 
-const EXISTING_SOLAR_CAPACITY_KW = 4200; // Riverbend Solar Farm
+const EXISTING_SOLAR_CAPACITY_KW = 4200; // Kedah Large Scale Solar Park
 const EXPORT_CREDIT_USD_PER_KWH = 0.08;
 
 /**
