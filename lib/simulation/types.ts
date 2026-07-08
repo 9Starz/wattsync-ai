@@ -36,7 +36,7 @@ export interface IntervalPoint {
   batteryFlowKw: number; // positive = charging, negative = discharging
   gridImportKw: number;
   gridExportKw: number;
-  electricityPrice: number; // $/kWh
+  electricityPrice: number; // RM/kWh
   weather: "sunny" | "partly_cloudy" | "cloudy" | "windy" | "rain";
 }
 

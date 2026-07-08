@@ -8,15 +8,18 @@ export function formatKwh(value: number): string {
   return `${Math.round(value)} kWh`;
 }
 
-export function formatUsd(value: number): string {
-  return value.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+/** Malaysian Ringgit, whole-ringgit rounding: 1277 -> "RM1,277", -450 -> "-RM450". */
+export function formatRm(value: number): string {
+  const rounded = Math.round(value);
+  const abs = Math.abs(rounded).toLocaleString("en-US");
+  return rounded < 0 ? `-RM${abs}` : `RM${abs}`;
 }
 
-/** Annualized run-rate from a daily USD figure: 1277 -> "$466K/yr", 3200 -> "$1.17M/yr". */
-export function formatUsdPerYear(dailyUsd: number): string {
-  const yearly = dailyUsd * 365;
-  if (Math.abs(yearly) >= 1_000_000) return `$${(yearly / 1_000_000).toFixed(2)}M/yr`;
-  return `$${Math.round(yearly / 1000)}K/yr`;
+/** Annualized run-rate from a daily figure: 1277 -> "RM466K/yr", 3200 -> "RM1.17M/yr". */
+export function formatRmPerYear(dailyValue: number): string {
+  const yearly = dailyValue * 365;
+  if (Math.abs(yearly) >= 1_000_000) return `RM${(yearly / 1_000_000).toFixed(2)}M/yr`;
+  return `RM${Math.round(yearly / 1000)}K/yr`;
 }
 
 export function formatKg(value: number): string {

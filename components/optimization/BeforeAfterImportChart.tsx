@@ -58,7 +58,7 @@ export function BeforeAfterImportChart({
           x2={21}
           fill="#fbbf24"
           fillOpacity={0.06}
-          label={{ value: "on-peak $0.34/kWh", position: "insideTop", fill: "#fbbf24", fontSize: 10 }}
+          label={{ value: "on-peak RM0.34/kWh", position: "insideTop", fill: "#fbbf24", fontSize: 10 }}
         />
         {/* No draw-in animation: this chart is the demo's money shot and must be complete the instant the page paints */}
         <Line type="monotone" dataKey="Before AI" stroke="#f87171" strokeWidth={2} strokeDasharray="5 4" dot={false} isAnimationActive={false} />

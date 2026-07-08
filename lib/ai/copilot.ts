@@ -14,7 +14,7 @@ import {
   getLiveAssets,
   getNowHour,
 } from "@/lib/simulation";
-import { formatHourLabel, formatKg, formatKw, formatKwh, formatUsd, formatUsdPerYear } from "@/lib/utils/format";
+import { formatHourLabel, formatKg, formatKw, formatKwh, formatRm, formatRmPerYear } from "@/lib/utils/format";
 import { answerWithClaude, CopilotChatMessage, isClaudeConfigured } from "./claudeProvider";
 import { getRecommendations, Recommendation } from "./recommendations";
 
@@ -62,7 +62,7 @@ const INTENTS: { match: RegExp; answer: (ctx: CopilotContext, question: string) 
       return (
         `Today the VPP executed ${ctx.decisions.length} coordinated actions: ${byWindow}. ` +
         `Net result vs uncoordinated operation: peak demand down ${c.peakDemandReductionPct.toFixed(0)}% (${formatKw(c.peakDemandReductionKw)}), grid imports down ${formatKwh(c.gridImportReductionKwh)}, ` +
-        `renewable utilization up from ${c.renewablePctBefore.toFixed(0)}% to ${c.renewablePctAfter.toFixed(0)}%, saving ${formatUsd(c.costSavedUsd)} and ${formatKg(c.carbonSavedKg)} of CO₂.`
+        `renewable utilization up from ${c.renewablePctBefore.toFixed(0)}% to ${c.renewablePctAfter.toFixed(0)}%, saving ${formatRm(c.costSavedUsd)} and ${formatKg(c.carbonSavedKg)} of CO₂.`
       );
     },
   },
@@ -108,8 +108,8 @@ const INTENTS: { match: RegExp; answer: (ctx: CopilotContext, question: string) 
       const c = ctx.comparison;
       const evSavings = ctx.comparison.evShiftedKwh * (0.34 - 0.11);
       return (
-        `The single biggest lever today is battery peak-shaving: it cut peak grid import by ${formatKw(c.peakImportReductionKw)} during the $0.34/kWh window, which drives most of the ${formatUsd(c.costSavedUsd)} total saving. ` +
-        `Second is EV load shifting — ${formatKwh(c.evShiftedKwh)} moved off-peak, worth roughly ${formatUsd(evSavings)}. ` +
+        `The single biggest lever today is battery peak-shaving: it cut peak grid import by ${formatKw(c.peakImportReductionKw)} during the RM0.34/kWh window, which drives most of the ${formatRm(c.costSavedUsd)} total saving. ` +
+        `Second is EV load shifting — ${formatKwh(c.evShiftedKwh)} moved off-peak, worth roughly ${formatRm(evSavings)}. ` +
         `The same actions avoided ${formatKg(c.carbonSavedKg)} of CO₂ by lifting renewable utilization from ${c.renewablePctBefore.toFixed(0)}% to ${c.renewablePctAfter.toFixed(0)}%.`
       );
     },
@@ -124,7 +124,7 @@ const INTENTS: { match: RegExp; answer: (ctx: CopilotContext, question: string) 
       return (
         `Total demand is currently ${formatKw(current.totalDemandKw)} — buildings account for ${formatKw(current.buildingDemandKw)} and EV charging adds ${formatKw(current.evDemandKw)} (${evShare}% of the total). ` +
         `Demand climbs through the late afternoon as building HVAC load overlaps with commuter EV charging, and is forecast to peak at ${formatKw(peak.kw)} around ${formatHourLabel(peak.hourOfDay)}. ` +
-        `Electricity is priced at $${current.electricityPrice.toFixed(2)}/kWh right now, so the optimizer is working to keep grid imports low through this window.`
+        `Electricity is priced at RM${current.electricityPrice.toFixed(2)}/kWh right now, so the optimizer is working to keep grid imports low through this window.`
       );
     },
   },
@@ -137,7 +137,7 @@ const INTENTS: { match: RegExp; answer: (ctx: CopilotContext, question: string) 
       const steps = top.map((r, i) => `${i + 1}. ${r.action} (${Math.round(r.confidence * 100)}% confidence)`).join(" ");
       return (
         `Demand peaks at ${formatKw(peak.kw)} around ${formatHourLabel(peak.hourOfDay)}. The battery is at ${Math.round(current.batterySocPercent)}% state of charge. My playbook before the peak: ${steps} ` +
-        `Executed together, these keep on-peak grid imports to a minimum while power costs $0.34/kWh.`
+        `Executed together, these keep on-peak grid imports to a minimum while power costs RM0.34/kWh.`
       );
     },
   },
@@ -243,11 +243,11 @@ const INTENTS: { match: RegExp; answer: (ctx: CopilotContext, question: string) 
     match: /(cost|money|sav|dollar|\$)/i,
     answer: (ctx) => {
       const { costSavedUsd, peakDemandReductionKw, aiTotals, rawTotals } = ctx.data;
-      const netLabel = (v: number) => (v < 0 ? `a ${formatUsd(-v)} net credit` : `a ${formatUsd(v)} net cost`);
+      const netLabel = (v: number) => (v < 0 ? `a ${formatRm(-v)} net credit` : `a ${formatRm(v)} net cost`);
       return (
-        `AI dispatch has saved ${formatUsd(costSavedUsd)} today versus running the same fleet without optimization (${netLabel(rawTotals.totalCostUsd)} unoptimized vs ${netLabel(aiTotals.totalCostUsd)} optimized, net of export credits). ` +
-        `The savings come from charging the battery on midday solar surplus instead of buying $0.34/kWh on-peak power, plus cutting peak grid import by ${formatKw(peakDemandReductionKw)}. ` +
-        `At today's rate that is an annualized run-rate of roughly ${formatUsdPerYear(costSavedUsd)} for this single site.`
+        `AI dispatch has saved ${formatRm(costSavedUsd)} today versus running the same fleet without optimization (${netLabel(rawTotals.totalCostUsd)} unoptimized vs ${netLabel(aiTotals.totalCostUsd)} optimized, net of export credits). ` +
+        `The savings come from charging the battery on midday solar surplus instead of buying RM0.34/kWh on-peak power, plus cutting peak grid import by ${formatKw(peakDemandReductionKw)}. ` +
+        `At today's rate that is an annualized run-rate of roughly ${formatRmPerYear(costSavedUsd)} for this single site.`
       );
     },
   },

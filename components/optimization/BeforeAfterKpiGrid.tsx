@@ -1,5 +1,5 @@
 import { OptimizationComparison } from "@/lib/optimization";
-import { formatKg, formatKw, formatKwh, formatUsd, formatUsdPerYear } from "@/lib/utils/format";
+import { formatKg, formatKw, formatKwh, formatRm, formatRmPerYear } from "@/lib/utils/format";
 
 interface Row {
   label: string;
@@ -11,7 +11,7 @@ interface Row {
 
 /** Negative net cost means export credits outearned imports — show that as a credit. */
 function formatNetCost(value: number): string {
-  return value < 0 ? `${formatUsd(-value)} credit` : formatUsd(value);
+  return value < 0 ? `${formatRm(-value)} credit` : formatRm(value);
 }
 
 /** Side-by-side before/after cards — the 60-second judge view of what the AI achieved. */
@@ -51,7 +51,7 @@ export function BeforeAfterKpiGrid({ comparison }: { comparison: OptimizationCom
       label: "Net Energy Cost",
       before: formatNetCost(c.before.totalCostUsd),
       after: formatNetCost(c.after.totalCostUsd),
-      delta: `${formatUsd(c.costSavedUsd)} · ≈${formatUsdPerYear(c.costSavedUsd)}`,
+      delta: `${formatRm(c.costSavedUsd)} · ≈${formatRmPerYear(c.costSavedUsd)}`,
       good: c.costSavedUsd > 0,
     },
     {

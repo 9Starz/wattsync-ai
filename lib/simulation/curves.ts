@@ -25,7 +25,7 @@ export function evDemandShapeCurve(hour: number): number {
   return clamp(eveningPeak + overnight + 0.05, 0.03, 1.05);
 }
 
-/** Time-of-use electricity price ($/kWh), peaking with evening demand. */
+/** Time-of-use electricity price (RM/kWh), peaking with evening demand. */
 export function priceShapeCurve(hour: number): number {
   const offPeak = 0.11;
   const midPeak = 0.18;

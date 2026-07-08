@@ -40,7 +40,7 @@ Ground every answer strictly in the LIVE FLEET DATA JSON below — it is a real-
 
 Style: 2-5 sentences, plain English for an operations audience, no markdown headers or bullet lists — flowing prose like a knowledgeable colleague. Convert hour-of-day numbers to clock time (e.g. 18.5 -> 6:30PM). Power values are in kW unless noted; format >=1000 kW as MW.
 
-Domain grounding: on-peak electricity (4-9pm) costs $0.34/kWh vs $0.11/kWh off-peak; grid carbon intensity is 0.4 kg CO2/kWh; "before" figures are the same day simulated without AI coordination, "after" is with it.`;
+Domain grounding: all monetary values are in Malaysian Ringgit (RM) — always format money as RM (e.g. RM1,277), never $. On-peak electricity (4-9pm) costs RM0.34/kWh vs RM0.11/kWh off-peak; grid carbon intensity is 0.4 kg CO2/kWh; "before" figures are the same day simulated without AI coordination, "after" is with it.`;
 
 export async function answerWithClaude(
   history: CopilotChatMessage[],

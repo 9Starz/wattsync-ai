@@ -70,12 +70,12 @@ function describe(type: DecisionType, avgKw: number, first: HourSlice): { title:
     case "battery_charge":
       return {
         title: `Charge battery from renewable surplus (${formatKw(avgKw)} avg)`,
-        reason: `Solar is producing ${formatKw(first.solarKw)} and energy costs only $${first.price.toFixed(2)}/kWh — banking surplus now avoids buying $0.34/kWh on-peak power tonight.`,
+        reason: `Solar is producing ${formatKw(first.solarKw)} and energy costs only RM${first.price.toFixed(2)}/kWh — banking surplus now avoids buying RM0.34/kWh on-peak power tonight.`,
       };
     case "battery_discharge":
       return {
         title: `Discharge battery to shave the evening peak (${formatKw(avgKw)} avg)`,
-        reason: `Demand peaks while on-peak power costs $${first.price.toFixed(2)}/kWh. Stored midday renewables cover the gap instead of grid imports (SOC ${Math.round(first.socPercent)}% at window start).`,
+        reason: `Demand peaks while on-peak power costs RM${first.price.toFixed(2)}/kWh. Stored midday renewables cover the gap instead of grid imports (SOC ${Math.round(first.socPercent)}% at window start).`,
       };
     case "ev_delay":
       return {
@@ -85,7 +85,7 @@ function describe(type: DecisionType, avgKw: number, first: HourSlice): { title:
     case "ev_resume":
       return {
         title: `Run delayed EV sessions on off-peak power (${formatKw(avgKw)} added)`,
-        reason: `Deferred EV energy is delivered overnight at $${first.price.toFixed(2)}/kWh — one third of the on-peak rate — while the grid is unstressed.`,
+        reason: `Deferred EV energy is delivered overnight at RM${first.price.toFixed(2)}/kWh — one third of the on-peak rate — while the grid is unstressed.`,
       };
     case "grid_export":
       return {
@@ -95,7 +95,7 @@ function describe(type: DecisionType, avgKw: number, first: HourSlice): { title:
     case "grid_import":
       return {
         title: `Import from grid (${formatKw(avgKw)} avg) — unavoidable`,
-        reason: `Renewables plus storage cannot cover demand in this window; importing here is the least-cost option at $${first.price.toFixed(2)}/kWh.`,
+        reason: `Renewables plus storage cannot cover demand in this window; importing here is the least-cost option at RM${first.price.toFixed(2)}/kWh.`,
       };
   }
 }

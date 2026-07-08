@@ -7,7 +7,7 @@
 ## ⚡ Judging in a hurry? 60 seconds:
 
 1. 🔗 **Live demo:** `ADD-VERCEL-URL-HERE` *(deploy: import this repo at [vercel.com/new](https://vercel.com/new), zero config)*
-2. ▶ Open **`/demo`** — a 3-act story: the 6pm problem → three coordinated AI moves → the measurable result (**−23% grid imports, ~$1,300/day saved ≈ $466K/yr, 385 kg CO₂ avoided — same assets, same weather**)
+2. ▶ Open **`/demo`** — a 3-act story: the 6pm problem → three coordinated AI moves → the measurable result (**−23% grid imports, ~RM1,300/day saved ≈ RM466K/yr, 385 kg CO₂ avoided — same assets, same weather**)
 3. ✦ Ask the **`/copilot`**: *"Why did the battery discharge at 6pm?"* — every answer is grounded in the live fleet data
 4. 🎬 **Video walkthrough:** `ADD-VIDEO-LINK-HERE` · 📸 [Screenshots below](#-visual-tour) · 📜 [Full demo script](docs/DEMO.md)
 
@@ -39,9 +39,9 @@ WattSync AI unifies the whole fleet into one Virtual Power Plant with four AI la
 
 ## The 60-second demo (`/demo`)
 
-1. **The 6pm problem** — buildings and EV chargers peak together as solar dies and power hits $0.34/kWh.
+1. **The 6pm problem** — buildings and EV chargers peak together as solar dies and power hits RM0.34/kWh.
 2. **Three coordinated moves** — bank free midday renewables in the battery, shift flexible EV charging overnight, discharge the battery through the peak.
-3. **The measurable result** — on the same simulated day with identical assets and weather: **peak demand −8%, grid energy imported −34%, ~$1,300 saved (an annualized run-rate of ≈$470K from one site), ~480 kg CO₂ avoided, renewable utilization 93% → 96%** (exact figures vary with each day's simulated weather).
+3. **The measurable result** — on the same simulated day with identical assets and weather: **peak demand −8%, grid energy imported −34%, ~RM1,300 saved (an annualized run-rate of ≈RM470K from one site), ~480 kg CO₂ avoided, renewable utilization 93% → 96%** (exact figures vary with each day's simulated weather).
 
 Every number on every page derives from one simulation source, so the story is internally consistent and auditable. Full presenter script + recording checklist: [docs/DEMO.md](docs/DEMO.md).
 

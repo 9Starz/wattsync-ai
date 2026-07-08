@@ -32,7 +32,7 @@ function scoreSite(site: CandidateSite): CriterionScore[] {
   const interconnection = Math.round(clamp01(1 - site.substationKm / 12) * 100);
   const permitting = PERMIT_SCORE[site.permitting];
   // Land: cost per MW of capacity, normalized to solar-lease benchmarks
-  // ($2k/MW/yr or less = 100, $12k/MW/yr = 0; typical ground leases run $3.5-7k/MW/yr)
+  // (RM2k/MW/yr or less = 100, RM12k/MW/yr = 0; typical ground leases run RM3.5-7k/MW/yr)
   const landCostPerMwYr = (site.landCostPerAcreYr * site.acres) / site.recommendedCapacityMw;
   const land = Math.round(clamp01(1 - (landCostPerMwYr - 2000) / 10000) * 100);
 
@@ -59,7 +59,7 @@ function scoreSite(site: CandidateSite): CriterionScore[] {
       label: "Land cost & fit",
       score: land,
       weight: WEIGHTS.land,
-      detail: `${site.acres} acres at $${site.landCostPerAcreYr.toLocaleString()}/acre/yr → $${Math.round(landCostPerMwYr).toLocaleString()}/MW/yr`,
+      detail: `${site.acres} acres at RM${site.landCostPerAcreYr.toLocaleString()}/acre/yr → RM${Math.round(landCostPerMwYr).toLocaleString()}/MW/yr`,
     },
   ];
 }
@@ -97,7 +97,7 @@ const PERFORMANCE_RATIO = 0.79; // soiling, wiring, inverter losses
 const TRACKING_GAIN = 1.22; // single-axis tracking vs fixed tilt (greenfield only)
 const CAPEX_PER_WATT = { greenfield: 1.1, rooftop: 1.45 }; // $/W-dc, 2026 utility benchmarks
 const OANDM_PER_KW_YR = 17; // $/kW-yr
-const BLENDED_ENERGY_VALUE = 0.13; // $/kWh — avoided on-peak imports + off-peak export credits
+const BLENDED_ENERGY_VALUE = 0.13; // RM/kWh — avoided on-peak imports + off-peak export tariff
 const CRF = 0.0858; // capital recovery factor: 7% discount, 25-year life
 const GRID_CARBON_T_PER_MWH = 0.4;
 

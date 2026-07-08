@@ -10,7 +10,7 @@ import {
   getIntegrationImpact,
   getSiteRanking,
 } from "@/lib/development";
-import { formatKwh, formatPct, formatUsd } from "@/lib/utils/format";
+import { formatKwh, formatPct, formatRm } from "@/lib/utils/format";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +50,7 @@ export default function DevelopmentPage() {
             label="Simple Payback"
             value={`${feasibility.simplePaybackYears.toFixed(1)} yrs`}
             accent="green"
-            hint={`LCOE $${feasibility.lcoeUsdPerMwh.toFixed(0)}/MWh`}
+            hint={`LCOE RM${feasibility.lcoeUsdPerMwh.toFixed(0)}/MWh`}
           />
         </div>
 
@@ -79,23 +79,23 @@ export default function DevelopmentPage() {
               {[
                 {
                   label: "CAPEX",
-                  value: formatUsd(feasibility.capexUsd),
-                  note: `$${feasibility.capexPerWatt.toFixed(2)}/W installed`,
+                  value: formatRm(feasibility.capexUsd),
+                  note: `RM${feasibility.capexPerWatt.toFixed(2)}/W installed`,
                 },
                 {
                   label: "Annual energy value",
-                  value: formatUsd(feasibility.annualRevenueUsd),
-                  note: "avoided on-peak imports + export credits at $0.13/kWh blended",
+                  value: formatRm(feasibility.annualRevenueUsd),
+                  note: "avoided on-peak imports + export tariff at RM0.13/kWh blended",
                 },
                 {
                   label: "Annual O&M + land",
-                  value: formatUsd(feasibility.annualOandMUsd),
-                  note: "$17/kW-yr O&M benchmark + site lease",
+                  value: formatRm(feasibility.annualOandMUsd),
+                  note: "RM17/kW-yr O&M benchmark + site lease",
                 },
                 {
                   label: "Simple payback",
                   value: `${feasibility.simplePaybackYears.toFixed(1)} years`,
-                  note: `LCOE $${feasibility.lcoeUsdPerMwh.toFixed(0)}/MWh at 7% / 25 yr`,
+                  note: `LCOE RM${feasibility.lcoeUsdPerMwh.toFixed(0)}/MWh at 7% / 25 yr`,
                 },
                 {
                   label: "CO₂ avoided",
@@ -140,9 +140,9 @@ export default function DevelopmentPage() {
             />
             <KpiCard
               label="Added Value / Day"
-              value={formatUsd(impact.dailySavingsUsd)}
+              value={formatRm(impact.dailySavingsUsd)}
               accent="green"
-              hint={`${formatUsd(impact.exportCreditValueUsd)} export credit + ${formatUsd(impact.importAvoidedValueUsd)} import savings`}
+              hint={`${formatRm(impact.exportCreditValueUsd)} export tariff + ${formatRm(impact.importAvoidedValueUsd)} import savings`}
             />
           </div>
 
@@ -151,8 +151,8 @@ export default function DevelopmentPage() {
             {top.site.recommendedCapacityMw.toFixed(1)} MW of midday solar to a fleet whose existing 4.2 MW array already
             drives grid imports to near-zero around noon. So{" "}
             <span className="text-foreground">{impact.exportSharePct.toFixed(0)}% of the new output is surplus</span> — it
-            flows to the grid as export at the $0.08/kWh credit rate rather than displacing the $0.34/kWh on-peak import
-            price, which is why the added value is export-led, not import-led. That&apos;s the signal a planner wants{" "}
+            flows to the grid as export at the RM0.08/kWh export tariff rather than displacing the RM0.34/kWh on-peak
+            import price, which is why the added value is export-led, not import-led. That&apos;s the signal a planner wants{" "}
             <span className="text-foreground">before</span> construction: the next asset should pair battery storage or
             target the evening peak, where the fleet still buys from the grid.{" "}
             <Link href="/dashboard" className="text-accent-green hover:underline">

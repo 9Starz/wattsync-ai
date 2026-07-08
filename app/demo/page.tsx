@@ -4,7 +4,7 @@ import { SectionCard } from "@/components/shared/SectionCard";
 import { BeforeAfterImportChart } from "@/components/optimization/BeforeAfterImportChart";
 import { getOptimizationComparison, getOptimizationDecisions } from "@/lib/optimization";
 import { getTodaySeries } from "@/lib/simulation";
-import { formatHourLabel, formatKg, formatKw, formatKwh, formatUsd, formatUsdPerYear } from "@/lib/utils/format";
+import { formatHourLabel, formatKg, formatKw, formatKwh, formatRm, formatRmPerYear } from "@/lib/utils/format";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +45,7 @@ export default function DemoPage() {
   const results = [
     { label: "Peak Demand", value: `-${comparison.peakDemandReductionPct.toFixed(0)}%`, hint: `${formatKw(comparison.peakDemandReductionKw)} shaved` },
     { label: "Grid Energy Imported", value: `-${comparison.gridImportReductionPct.toFixed(0)}%`, hint: `${formatKwh(comparison.gridImportReductionKwh)} avoided` },
-    { label: "Cost Saved", value: formatUsd(comparison.costSavedUsd), hint: `≈ ${formatUsdPerYear(comparison.costSavedUsd)} annualized run-rate` },
+    { label: "Cost Saved", value: formatRm(comparison.costSavedUsd), hint: `≈ ${formatRmPerYear(comparison.costSavedUsd)} annualized run-rate` },
     { label: "CO₂ Avoided", value: formatKg(comparison.carbonSavedKg), hint: `renewables ${comparison.renewablePctBefore.toFixed(0)}% → ${comparison.renewablePctAfter.toFixed(0)}%` },
   ];
 
@@ -63,7 +63,7 @@ export default function DemoPage() {
             As offices wind down and commuters plug in, demand across the fleet climbs to{" "}
             <span className="font-medium text-foreground">{formatKw(rawTotals.peakDemandKw)}</span> — right as solar
             output collapses and on-peak power hits{" "}
-            <span className="font-medium text-warning">$0.34/kWh, three times the overnight rate</span>. Left
+            <span className="font-medium text-warning">RM0.34/kWh, three times the overnight rate</span>. Left
             uncoordinated, the site imports up to{" "}
             <span className="font-medium text-critical">{formatKw(rawTotals.peakGridImportKw)}</span> of expensive,
             carbon-heavy grid power around {peakLabel}. Every asset behaves sensibly on its own; the system as a whole
@@ -117,8 +117,8 @@ export default function DemoPage() {
         <SectionCard title="The 60-second takeaway" subtitle="What just happened, in one sentence">
           <p className="max-w-3xl text-sm leading-relaxed text-muted">
             <span className="font-medium text-foreground">
-              WattSync AI turned {decisions.length} coordinated decisions into {formatUsd(comparison.costSavedUsd)} of
-              savings — an annualized run-rate of ≈{formatUsdPerYear(comparison.costSavedUsd).replace("/yr", " a year")}{" "}
+              WattSync AI turned {decisions.length} coordinated decisions into {formatRm(comparison.costSavedUsd)} of
+              savings — an annualized run-rate of ≈{formatRmPerYear(comparison.costSavedUsd).replace("/yr", " a year")}{" "}
               from this single site — plus {formatKg(comparison.carbonSavedKg)} of avoided CO₂ and a{" "}
               {comparison.peakDemandReductionPct.toFixed(0)}% lower peak
             </span>{" "}

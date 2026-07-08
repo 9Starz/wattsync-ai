@@ -43,7 +43,7 @@ export function getRecommendations(): Recommendation[] {
           ? `, with generation exceeding demand by an average ${formatKw(insights.surplusWindow.avgSurplusKw)}`
           : ""
       }. Battery is at ${Math.round(current.batterySocPercent)}% and has headroom.`,
-      impact: "Stores near-zero-cost renewable energy that offsets on-peak imports priced at $0.34/kWh after 4pm.",
+      impact: "Stores near-zero-cost renewable energy that offsets on-peak imports priced at RM0.34/kWh after 4pm.",
       confidence: sunnyish ? 0.92 : 0.74,
       action: "Schedule battery charging at maximum rate during the 11am - 2pm surplus window.",
       priority: "high",
@@ -86,7 +86,7 @@ export function getRecommendations(): Recommendation[] {
       id: "rec-grid-risk",
       title: `Grid import risk expected around ${clockLabel(insights.worstShortage.hourOfDay)}`,
       reason: insights.gridRisk.reason,
-      impact: `Unmitigated, importing ${formatKw(insights.worstShortage.kw)} at on-peak prices adds roughly $${Math.round(
+      impact: `Unmitigated, importing ${formatKw(insights.worstShortage.kw)} at on-peak prices adds roughly RM${Math.round(
         (insights.worstShortage.kw * 0.34) / 10
       ) * 10}/hour in energy cost and raises the carbon intensity of the fleet.`,
       confidence: insights.gridRisk.level === "high" ? 0.9 : 0.78,
