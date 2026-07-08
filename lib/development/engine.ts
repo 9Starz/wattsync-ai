@@ -155,20 +155,25 @@ export function getIntegrationImpact(site: CandidateSite): IntegrationImpact {
   let extraGenKwh = 0;
   let importAvoidedKwh = 0;
   let extraExportKwh = 0;
-  let savingsUsd = 0;
+  let importAvoidedValueUsd = 0;
+  let exportCreditValueUsd = 0;
   let baseImportKwh = 0;
   let totalDemandKwh = 0;
   let renewableUsedKwh = 0;
 
   for (const p of points) {
     const extraKw = p.solarKw * scale;
+    // The new solar first offsets whatever the fleet is still importing this interval;
+    // the rest is surplus the fleet can't self-consume and is exported to the grid.
     const usedKw = Math.min(p.gridImportKw, extraKw);
     const exportedKw = extraKw - usedKw;
 
     extraGenKwh += extraKw * hours;
     importAvoidedKwh += usedKw * hours;
     extraExportKwh += exportedKw * hours;
-    savingsUsd += usedKw * hours * p.electricityPrice + exportedKw * hours * EXPORT_CREDIT_USD_PER_KWH;
+    // Import avoidance is worth the live TOU price; export earns the lower credit rate.
+    importAvoidedValueUsd += usedKw * hours * p.electricityPrice;
+    exportCreditValueUsd += exportedKw * hours * EXPORT_CREDIT_USD_PER_KWH;
     baseImportKwh += p.gridImportKw * hours;
     totalDemandKwh += p.totalDemandKw * hours;
     renewableUsedKwh += (p.totalDemandKw - p.gridImportKw) * hours;
@@ -179,11 +184,14 @@ export function getIntegrationImpact(site: CandidateSite): IntegrationImpact {
 
   return {
     extraDailyGenerationKwh: extraGenKwh,
+    exportSharePct: extraGenKwh > 0 ? (extraExportKwh / extraGenKwh) * 100 : 0,
     gridImportReductionKwh: importAvoidedKwh,
     gridImportReductionPct: baseImportKwh > 0 ? (importAvoidedKwh / baseImportKwh) * 100 : 0,
     renewablePctBefore,
     renewablePctAfter,
     extraExportKwh,
-    dailySavingsUsd: savingsUsd,
+    exportCreditValueUsd,
+    importAvoidedValueUsd,
+    dailySavingsUsd: importAvoidedValueUsd + exportCreditValueUsd,
   };
 }

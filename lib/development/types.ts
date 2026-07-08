@@ -56,11 +56,17 @@ export interface FeasibilityReport {
 /** What adding the asset would do to the live VPP, computed from today's simulation. */
 export interface IntegrationImpact {
   extraDailyGenerationKwh: number;
+  /** Share of the new output that is surplus and flows to the grid as export (0-100). */
+  exportSharePct: number;
   gridImportReductionKwh: number;
   gridImportReductionPct: number;
   renewablePctBefore: number;
   renewablePctAfter: number;
   extraExportKwh: number;
+  /** Value from selling surplus back to the grid at the export credit rate. */
+  exportCreditValueUsd: number;
+  /** Value from displacing grid imports (small when the fleet is already solar-heavy at midday). */
+  importAvoidedValueUsd: number;
   dailySavingsUsd: number;
 }
 

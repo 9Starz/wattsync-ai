@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { TopBar } from "@/components/layout/TopBar";
 import { KpiCard } from "@/components/shared/KpiCard";
 import { SectionCard } from "@/components/shared/SectionCard";
@@ -9,7 +10,7 @@ import {
   getIntegrationImpact,
   getSiteRanking,
 } from "@/lib/development";
-import { formatKwh, formatPct, formatUsd, formatUsdPerYear } from "@/lib/utils/format";
+import { formatKwh, formatPct, formatUsd } from "@/lib/utils/format";
 
 export const dynamic = "force-dynamic";
 
@@ -123,27 +124,40 @@ export default function DevelopmentPage() {
               label="Extra Clean Generation"
               value={formatKwh(impact.extraDailyGenerationKwh)}
               accent="green"
-              hint="added to today's fleet output"
+              hint="new midday solar added to today's fleet output"
             />
             <KpiCard
-              label="Grid Imports"
-              value={`-${formatPct(impact.gridImportReductionPct)}`}
-              accent="green"
-              hint={`${formatKwh(impact.gridImportReductionKwh)} less bought from the grid today`}
-            />
-            <KpiCard
-              label="Renewable Coverage"
-              value={`${impact.renewablePctAfter.toFixed(0)}%`}
+              label="Exported to Grid"
+              value={formatKwh(impact.extraExportKwh)}
               accent="blue"
-              hint={`up from ${impact.renewablePctBefore.toFixed(0)}% of demand today`}
+              hint={`${impact.exportSharePct.toFixed(0)}% of the new output — surplus the fleet can't self-consume`}
             />
             <KpiCard
-              label="Additional Savings"
-              value={`${formatUsd(impact.dailySavingsUsd)}/day`}
-              accent="green"
-              trend={`≈ ${formatUsdPerYear(impact.dailySavingsUsd)} run-rate`}
-              hint={`incl. ${formatKwh(impact.extraExportKwh)} exported at credit`}
+              label="Grid Imports Avoided"
+              value={formatKwh(impact.gridImportReductionKwh)}
+              accent="neutral"
+              hint={`only -${formatPct(impact.gridImportReductionPct)} — the fleet already imports near-zero at midday`}
             />
+            <KpiCard
+              label="Added Value / Day"
+              value={formatUsd(impact.dailySavingsUsd)}
+              accent="green"
+              hint={`${formatUsd(impact.exportCreditValueUsd)} export credit + ${formatUsd(impact.importAvoidedValueUsd)} import savings`}
+            />
+          </div>
+
+          <div className="mt-4 rounded-lg border border-border bg-surface-raised/40 p-4 text-xs leading-relaxed text-muted">
+            <span className="font-medium text-foreground">Why the split matters.</span> {top.site.name} adds{" "}
+            {top.site.recommendedCapacityMw.toFixed(1)} MW of midday solar to a fleet whose existing 4.2 MW array already
+            drives grid imports to near-zero around noon. So{" "}
+            <span className="text-foreground">{impact.exportSharePct.toFixed(0)}% of the new output is surplus</span> — it
+            flows to the grid as export at the $0.08/kWh credit rate rather than displacing the $0.34/kWh on-peak import
+            price, which is why the added value is export-led, not import-led. That&apos;s the signal a planner wants{" "}
+            <span className="text-foreground">before</span> construction: the next asset should pair battery storage or
+            target the evening peak, where the fleet still buys from the grid.{" "}
+            <Link href="/dashboard" className="text-accent-green hover:underline">
+              See the live fleet it would join →
+            </Link>
           </div>
         </SectionCard>
 
