@@ -1,3 +1,4 @@
+import { Sparkles } from "lucide-react";
 import { KpiCard } from "@/components/shared/KpiCard";
 import { Forecast24h } from "@/lib/forecasting";
 import { IntervalPoint } from "@/lib/simulation";
@@ -39,8 +40,8 @@ export function AiInsightsRow({
 
   return (
     <div>
-      <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-accent-green">
-        <span>✦</span> AI Insights — next 24 hours
+      <p className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand">
+        <Sparkles className="h-3.5 w-3.5 text-accent-cyan" strokeWidth={2.5} /> AI Insights — next 24 hours
       </p>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <KpiCard

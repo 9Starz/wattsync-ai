@@ -12,6 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import { AccuracyTrendDay } from "@/lib/validation";
+import { VIZ, tooltipLabelStyle, tooltipStyle } from "@/lib/utils/chartColors";
 
 /** Daily forecast accuracy over the past week — the evidence the model stays reliable. */
 export function AccuracyTrendChart({ days, average }: { days: AccuracyTrendDay[]; average: number }) {
@@ -20,31 +21,31 @@ export function AccuracyTrendChart({ days, average }: { days: AccuracyTrendDay[]
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#223047" vertical={false} />
-        <XAxis dataKey="label" stroke="#8ca0b8" fontSize={11} tickLine={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke={VIZ.gridline} vertical={false} />
+        <XAxis dataKey="label" stroke={VIZ.axis} fontSize={11} tickLine={false} />
         <YAxis
           domain={[80, 100]}
-          stroke="#8ca0b8"
+          stroke={VIZ.axis}
           fontSize={11}
           tickLine={false}
           width={38}
           tickFormatter={(v) => `${v}%`}
         />
         <Tooltip
-          contentStyle={{ background: "#131c2a", border: "1px solid #223047", borderRadius: 8, fontSize: 12 }}
-          labelStyle={{ color: "#e7edf5" }}
+          contentStyle={tooltipStyle}
+          labelStyle={tooltipLabelStyle}
           formatter={(value) => [`${value}%`, "Accuracy"]}
-          cursor={{ fill: "#22304733" }}
+          cursor={{ fill: VIZ.brand, fillOpacity: 0.06 }}
         />
         <ReferenceLine
           y={average}
-          stroke="#8ca0b8"
+          stroke={VIZ.axis}
           strokeDasharray="4 4"
-          label={{ value: `${average.toFixed(0)}% avg`, position: "insideTopRight", fill: "#8ca0b8", fontSize: 10 }}
+          label={{ value: `${average.toFixed(0)}% avg`, position: "insideTopRight", fill: VIZ.axis, fontSize: 10 }}
         />
         <Bar dataKey="accuracy" radius={[3, 3, 0, 0]} isAnimationActive={false}>
           {data.map((d, i) => (
-            <Cell key={i} fill={d.accuracy >= average ? "#34d399" : "#fbbf24"} />
+            <Cell key={i} fill={d.accuracy >= average ? VIZ.green : VIZ.warning} />
           ))}
         </Bar>
       </BarChart>

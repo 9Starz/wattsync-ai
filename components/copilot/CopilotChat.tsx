@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { Sparkles } from "lucide-react";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -83,7 +84,7 @@ export function CopilotChat() {
               type="button"
               onClick={() => void send(p)}
               disabled={busy}
-              className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs text-muted transition-colors hover:border-accent-green-dim/50 hover:text-accent-green disabled:opacity-50"
+              className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs text-muted transition-colors hover:border-brand/40 hover:text-brand disabled:opacity-50"
             >
               {p}
             </button>
@@ -99,7 +100,7 @@ export function CopilotChat() {
           <button
             type="submit"
             disabled={busy || !input.trim()}
-            className="rounded-lg bg-accent-green-dim px-4 py-2.5 text-sm font-medium text-[#04140f] transition-opacity hover:opacity-90 disabled:opacity-40"
+            className="rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover disabled:opacity-40"
           >
             Send
           </button>
@@ -116,15 +117,15 @@ function MessageBubble({ message }: { message: ChatMessage }) {
       <div
         className={
           isUser
-            ? "max-w-[75%] rounded-2xl rounded-br-sm bg-accent-blue-dim/20 border border-accent-blue-dim/30 px-4 py-2.5 text-sm text-foreground"
-            : "max-w-[85%] rounded-2xl rounded-bl-sm border border-border bg-surface px-4 py-2.5 text-sm leading-relaxed text-foreground"
+            ? "max-w-[75%] rounded-2xl rounded-br-sm bg-brand text-white px-4 py-2.5 text-sm"
+            : "card-shadow max-w-[85%] rounded-2xl rounded-bl-sm border border-border bg-surface px-4 py-2.5 text-sm leading-relaxed text-foreground"
         }
       >
         {!isUser && (
-          <p className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-accent-green">
-            <span>✦</span> Copilot
+          <p className="mb-1 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-brand">
+            <Sparkles className="h-3.5 w-3.5 text-accent-cyan" strokeWidth={2.5} /> Copilot
             {message.mode === "claude" && (
-              <span className="rounded-full border border-accent-green-dim/40 bg-accent-green-dim/10 px-1.5 py-px text-[9px] font-medium normal-case tracking-normal text-accent-green">
+              <span className="rounded-full border border-accent-cyan/40 bg-accent-cyan/10 px-1.5 py-px text-[9px] font-medium normal-case tracking-normal text-brand">
                 AI-powered · Claude
               </span>
             )}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Zap } from "lucide-react";
 import { KpiCard } from "@/components/shared/KpiCard";
 import { getOptimizationComparison, getOptimizationDecisions } from "@/lib/optimization";
 import { getNowHour } from "@/lib/simulation";
@@ -16,10 +17,10 @@ export function VppOptimizationRow() {
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
-        <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-accent-blue">
-          <span>⚡</span> VPP Optimization — AI vs uncoordinated (today)
+        <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand">
+          <Zap className="h-3.5 w-3.5 text-brand" strokeWidth={2.5} /> VPP Optimization — AI vs uncoordinated (today)
         </p>
-        <Link href="/optimization" className="text-xs font-medium text-accent-green hover:underline">
+        <Link href="/optimization" className="text-xs font-semibold text-brand hover:text-brand-hover hover:underline">
           View decisions →
         </Link>
       </div>

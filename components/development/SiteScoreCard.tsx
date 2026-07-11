@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { Sparkles } from "lucide-react";
 import { SiteScore } from "@/lib/development";
 
 /** One candidate site with its weighted screening scores — the #1 site is highlighted. */
@@ -9,9 +10,9 @@ export function SiteScoreCard({ ranked }: { ranked: SiteScore }) {
   return (
     <div
       className={clsx(
-        "flex flex-col rounded-xl border p-5",
+        "card-shadow flex flex-col rounded-xl border p-5",
         recommended
-          ? "border-accent-green-dim/50 bg-gradient-to-br from-accent-green-dim/10 via-surface to-surface"
+          ? "border-accent-green/40 bg-gradient-to-br from-accent-green/8 via-surface to-surface"
           : "border-border bg-surface"
       )}
     >
@@ -24,8 +25,8 @@ export function SiteScoreCard({ ranked }: { ranked: SiteScore }) {
           </p>
         </div>
         {recommended ? (
-          <span className="shrink-0 rounded-full border border-accent-green-dim/50 bg-accent-green-dim/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent-green">
-            ✦ AI recommended
+          <span className="flex shrink-0 items-center gap-1 rounded-full border border-accent-green/50 bg-accent-green/12 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent-green">
+            <Sparkles className="h-3 w-3" strokeWidth={2.5} /> AI recommended
           </span>
         ) : (
           <span className="shrink-0 rounded-full border border-border bg-surface-raised/60 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted">

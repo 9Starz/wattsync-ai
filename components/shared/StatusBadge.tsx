@@ -22,9 +22,9 @@ export function StatusBadge({ status }: { status: AssetStatus }) {
 }
 
 const SEVERITY_STYLES: Record<string, string> = {
-  low: "bg-accent-blue/10 text-accent-blue border-accent-blue/40",
+  low: "bg-brand/10 text-brand border-brand/30",
   medium: "bg-warning/10 text-warning border-warning/40",
-  high: "bg-orange-500/10 text-orange-400 border-orange-500/40",
+  high: "bg-warning/15 text-warning border-warning/50",
   critical: "bg-critical/10 text-critical border-critical/40",
 };
 

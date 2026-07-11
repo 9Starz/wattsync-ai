@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { IntervalPoint } from "@/lib/simulation";
 import { formatAxisKw, formatHourLabel, formatKw } from "@/lib/utils/format";
+import { VIZ, tooltipLabelStyle, tooltipStyle } from "@/lib/utils/chartColors";
 
 /**
  * EV charging shift: without AI the load spikes with the evening commute; the VPP
@@ -37,25 +38,25 @@ export function EvScheduleChart({
       <ComposedChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="evAiGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#38bdf8" stopOpacity={0.4} />
-            <stop offset="100%" stopColor="#38bdf8" stopOpacity={0.03} />
+            <stop offset="0%" stopColor={VIZ.brand} stopOpacity={0.28} />
+            <stop offset="100%" stopColor={VIZ.brand} stopOpacity={0.02} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#223047" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke={VIZ.gridline} vertical={false} />
         <XAxis
           dataKey="hour"
           type="number"
           domain={[0, 24]}
           ticks={[0, 4, 8, 12, 16, 20, 24]}
           tickFormatter={(h) => formatHourLabel(h)}
-          stroke="#8ca0b8"
+          stroke={VIZ.axis}
           fontSize={11}
           tickLine={false}
         />
-        <YAxis stroke="#8ca0b8" fontSize={11} tickLine={false} tickFormatter={formatAxisKw} width={52} />
+        <YAxis stroke={VIZ.axis} fontSize={11} tickLine={false} tickFormatter={formatAxisKw} width={52} />
         <Tooltip
-          contentStyle={{ background: "#131c2a", border: "1px solid #223047", borderRadius: 8, fontSize: 12 }}
-          labelStyle={{ color: "#e7edf5" }}
+          contentStyle={tooltipStyle}
+          labelStyle={tooltipLabelStyle}
           labelFormatter={(h) => formatHourLabel(h as number)}
           formatter={(value) => formatKw(Number(value))}
         />
@@ -63,12 +64,12 @@ export function EvScheduleChart({
         <ReferenceArea
           x1={16}
           x2={21}
-          fill="#fbbf24"
-          fillOpacity={0.06}
-          label={{ value: "on-peak", position: "insideTop", fill: "#fbbf24", fontSize: 10 }}
+          fill={VIZ.warning}
+          fillOpacity={0.08}
+          label={{ value: "on-peak", position: "insideTop", fill: VIZ.warning, fontSize: 10 }}
         />
-        <Line type="monotone" dataKey="Without AI" stroke="#f87171" strokeWidth={2} strokeDasharray="5 4" dot={false} />
-        <Area type="monotone" dataKey="With AI" stroke="#38bdf8" strokeWidth={2} fill="url(#evAiGradient)" />
+        <Line type="monotone" dataKey="Without AI" stroke={VIZ.critical} strokeWidth={2} strokeDasharray="5 4" dot={false} isAnimationActive={false} />
+        <Area type="monotone" dataKey="With AI" stroke={VIZ.brand} strokeWidth={2.5} fill="url(#evAiGradient)" isAnimationActive={false} />
       </ComposedChart>
     </ResponsiveContainer>
   );

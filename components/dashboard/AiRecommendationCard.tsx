@@ -1,3 +1,4 @@
+import { Sparkles } from "lucide-react";
 import { Recommendation } from "@/lib/ai/recommendations";
 
 /**
@@ -7,13 +8,13 @@ import { Recommendation } from "@/lib/ai/recommendations";
  */
 export function AiRecommendationCard({ recommendation }: { recommendation?: Recommendation }) {
   return (
-    <div className="rounded-xl border border-accent-green-dim/30 bg-gradient-to-br from-accent-green-dim/10 via-surface to-surface p-5">
+    <div className="card-shadow rounded-xl border border-accent-cyan/25 bg-gradient-to-br from-accent-cyan/5 via-surface to-surface p-5">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent-green/20 text-xs text-accent-green">
-            ✦
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent-cyan/15 text-accent-cyan">
+            <Sparkles className="h-3.5 w-3.5" strokeWidth={2.5} />
           </span>
-          <p className="text-xs font-semibold uppercase tracking-wide text-accent-green">AI Recommendation</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-brand">AI Recommendation</p>
         </div>
         {recommendation && (
           <span className="rounded-full border border-border bg-surface px-2.5 py-0.5 text-[11px] font-medium text-muted">

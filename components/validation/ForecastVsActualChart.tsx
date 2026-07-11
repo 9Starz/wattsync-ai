@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { ValidationPoint } from "@/lib/validation";
 import { formatAxisKw, formatHourLabel, formatKw } from "@/lib/utils/format";
+import { VIZ, tooltipLabelStyle, tooltipStyle } from "@/lib/utils/chartColors";
 
 /**
  * Prediction vs Actual for one completed day. Shaded band = the confidence range the
@@ -27,7 +28,7 @@ export function ForecastVsActualChart({
   metric: "generation" | "demand";
 }) {
   const isGen = metric === "generation";
-  const color = isGen ? "#34d399" : "#38bdf8";
+  const color = isGen ? VIZ.green : VIZ.demand;
 
   const data = points.map((p) => ({
     hour: p.hourOfDay,
@@ -39,21 +40,21 @@ export function ForecastVsActualChart({
   return (
     <ResponsiveContainer width="100%" height={280}>
       <ComposedChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#223047" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke={VIZ.gridline} vertical={false} />
         <XAxis
           dataKey="hour"
           type="number"
           domain={[0, 24]}
           ticks={[0, 4, 8, 12, 16, 20, 24]}
           tickFormatter={(h) => formatHourLabel(h)}
-          stroke="#8ca0b8"
+          stroke={VIZ.axis}
           fontSize={11}
           tickLine={false}
         />
-        <YAxis stroke="#8ca0b8" fontSize={11} tickLine={false} tickFormatter={formatAxisKw} width={52} />
+        <YAxis stroke={VIZ.axis} fontSize={11} tickLine={false} tickFormatter={formatAxisKw} width={52} />
         <Tooltip
-          contentStyle={{ background: "#131c2a", border: "1px solid #223047", borderRadius: 8, fontSize: 12 }}
-          labelStyle={{ color: "#e7edf5" }}
+          contentStyle={tooltipStyle}
+          labelStyle={tooltipLabelStyle}
           labelFormatter={(h) => formatHourLabel(h as number)}
           formatter={(value, name) => [formatKw(Number(value)), name === "actual" ? "Actual" : "Forecast"]}
         />
@@ -74,7 +75,7 @@ export function ForecastVsActualChart({
           type="monotone"
           dataKey="forecast"
           name="Forecast"
-          stroke="#8ca0b8"
+          stroke={VIZ.forecast}
           strokeWidth={2}
           strokeDasharray="5 4"
           dot={false}

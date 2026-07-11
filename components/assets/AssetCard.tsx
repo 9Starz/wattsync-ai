@@ -1,15 +1,16 @@
 import clsx from "clsx";
+import { BatteryCharging, Building2, Plug, Sun, Waves, Wind, type LucideIcon } from "lucide-react";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Alert, Asset, ASSET_TYPE_LABEL } from "@/lib/simulation";
 import { formatKw } from "@/lib/utils/format";
 
-const TYPE_ICON: Record<Asset["type"], string> = {
-  solar_farm: "☀",
-  wind_turbine: "≋",
-  hydro_plant: "▽",
-  battery_storage: "▮",
-  ev_charging_station: "⚡",
-  smart_building: "▤",
+const TYPE_ICON: Record<Asset["type"], LucideIcon> = {
+  solar_farm: Sun,
+  wind_turbine: Wind,
+  hydro_plant: Waves,
+  battery_storage: BatteryCharging,
+  ev_charging_station: Plug,
+  smart_building: Building2,
 };
 
 /** Consumption assets draw power rather than generate it — label their kW accordingly. */
@@ -18,13 +19,19 @@ const CONSUMES: Asset["type"][] = ["ev_charging_station", "smart_building"];
 export function AssetCard({ asset, alert }: { asset: Asset; alert?: Alert }) {
   const utilization = Math.min(100, Math.round((asset.currentOutputKw / asset.capacityKw) * 100));
   const consumes = CONSUMES.includes(asset.type);
+  const Icon = TYPE_ICON[asset.type];
 
   return (
-    <div className="flex flex-col rounded-xl border border-border bg-surface p-5">
+    <div className="card-shadow flex flex-col rounded-xl border border-border bg-surface p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-raised text-lg text-accent-green">
-            {TYPE_ICON[asset.type]}
+          <span
+            className={clsx(
+              "flex h-10 w-10 items-center justify-center rounded-lg",
+              consumes ? "bg-brand/8 text-brand" : "bg-accent-green/10 text-accent-green"
+            )}
+          >
+            <Icon className="h-5 w-5" strokeWidth={2} />
           </span>
           <div>
             <p className="text-sm font-semibold text-foreground">{asset.name}</p>

@@ -5,6 +5,7 @@ import { ForecastChart } from "@/components/forecast/ForecastChart";
 import { SurplusShortageChart } from "@/components/forecast/SurplusShortageChart";
 import { forecastNext24h } from "@/lib/forecasting";
 import { formatHourLabel, formatKw, formatKwh } from "@/lib/utils/format";
+import { VIZ } from "@/lib/utils/chartColors";
 
 export const dynamic = "force-dynamic";
 
@@ -56,10 +57,10 @@ export default function ForecastPage() {
             title="Renewable Generation Forecast"
             subtitle="Solar + wind + hydro, shaded band = confidence range"
           >
-            <ForecastChart points={forecast.points} metric="generation" color="#34d399" />
+            <ForecastChart points={forecast.points} metric="generation" color={VIZ.green} />
           </SectionCard>
           <SectionCard title="Energy Demand Forecast" subtitle="Buildings + EV charging, shaded band = confidence range">
-            <ForecastChart points={forecast.points} metric="demand" color="#38bdf8" />
+            <ForecastChart points={forecast.points} metric="demand" color={VIZ.demand} />
           </SectionCard>
         </div>
 

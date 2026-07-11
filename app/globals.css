@@ -1,18 +1,33 @@
 @import "tailwindcss";
 
+/*
+ * WeaveGrid AI — enterprise design system.
+ * Light, premium, utility-grade. Brand blue leads; cyan marks AI/intelligence;
+ * green marks renewable/positive. Neutrals are slate. One system, every page.
+ */
 :root {
-  --background: #070b12;
-  --surface: #0e1520;
-  --surface-raised: #131c2a;
-  --border: #223047;
-  --foreground: #e7edf5;
-  --muted: #8ca0b8;
-  --accent-green: #34d399;
-  --accent-green-dim: #10b981;
-  --accent-blue: #38bdf8;
-  --accent-blue-dim: #0ea5e9;
-  --warning: #fbbf24;
-  --critical: #f87171;
+  /* Neutrals */
+  --background: #f8fafc;
+  --surface: #ffffff; /* cards */
+  --surface-raised: #f1f5f9; /* nested / hover surfaces */
+  --border: #e2e8f0;
+  --foreground: #1e293b; /* primary text */
+  --muted: #64748b; /* secondary text */
+
+  /* Brand */
+  --brand: #0f4c81; /* primary brand blue */
+  --brand-hover: #1565a5;
+  --accent-cyan: #00c2ff; /* AI / intelligence / active */
+
+  /* Semantic accents */
+  --accent-green: #27ae60; /* renewable / success / savings */
+  --accent-green-dim: #27ae60; /* tinted via opacity on light surfaces */
+  --accent-blue: #0f4c81; /* legacy alias → brand blue (primary metrics) */
+  --accent-blue-dim: #1565a5;
+  --warning: #f39c12; /* peak demand / forecast uncertainty */
+  --critical: #e74c3c; /* critical alerts / failures */
+
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 2px 8px rgba(15, 23, 42, 0.05);
 }
 
 @theme inline {
@@ -22,26 +37,41 @@
   --color-border: var(--border);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-accent-cyan: var(--accent-cyan);
   --color-accent-green: var(--accent-green);
   --color-accent-green-dim: var(--accent-green-dim);
   --color-accent-blue: var(--accent-blue);
   --color-accent-blue-dim: var(--accent-blue-dim);
   --color-warning: var(--warning);
   --color-critical: var(--critical);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
 }
 
 body {
-  background: radial-gradient(circle at 15% 0%, #0d1b2a 0%, var(--background) 45%);
+  background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), "Segoe UI", Arial, Helvetica, sans-serif;
   min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Soft enterprise card elevation */
+.card-shadow {
+  box-shadow: var(--shadow-card);
+}
+
+/* Tabular figures for KPI numbers via JetBrains Mono */
+.font-numeric {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-feature-settings: "tnum" 1;
 }
 
 ::selection {
-  background: var(--accent-green-dim);
-  color: #04140f;
+  background: color-mix(in srgb, var(--accent-cyan) 22%, transparent);
+  color: var(--brand);
 }
 
 .scrollbar-thin::-webkit-scrollbar {
@@ -49,6 +79,24 @@ body {
   height: 8px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: #cbd5e1;
   border-radius: 9999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Subtle, enterprise-grade motion only */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-fade-in {
+  animation: fadeIn 0.35s ease-out both;
 }

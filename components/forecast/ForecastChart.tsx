@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { ForecastPoint } from "@/lib/forecasting";
 import { formatAxisKw, formatHourLabel, formatKw } from "@/lib/utils/format";
+import { VIZ, tooltipLabelStyle, tooltipStyle } from "@/lib/utils/chartColors";
 
 interface ForecastChartProps {
   points: ForecastPoint[];
@@ -38,21 +39,21 @@ export function ForecastChart({ points, metric, color }: ForecastChartProps) {
   return (
     <ResponsiveContainer width="100%" height={240}>
       <ComposedChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#223047" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke={VIZ.gridline} vertical={false} />
         <XAxis
           dataKey="hoursAhead"
           type="number"
           domain={[0, 24]}
           ticks={[0, 4, 8, 12, 16, 20, 24]}
           tickFormatter={(h) => (h === 0 ? "Now" : `+${h}h`)}
-          stroke="#8ca0b8"
+          stroke={VIZ.axis}
           fontSize={11}
           tickLine={false}
         />
-        <YAxis stroke="#8ca0b8" fontSize={11} tickLine={false} width={52} tickFormatter={formatAxisKw} />
+        <YAxis stroke={VIZ.axis} fontSize={11} tickLine={false} width={52} tickFormatter={formatAxisKw} />
         <Tooltip
-          contentStyle={{ background: "#131c2a", border: "1px solid #223047", borderRadius: 8, fontSize: 12 }}
-          labelStyle={{ color: "#e7edf5" }}
+          contentStyle={tooltipStyle}
+          labelStyle={tooltipLabelStyle}
           labelFormatter={(h) => {
             const p = data.find((d) => d.hoursAhead === h);
             return p ? `+${(h as number).toFixed(1)}h · ${formatHourLabel(p.hourOfDay)}` : `+${h}h`;
@@ -64,8 +65,8 @@ export function ForecastChart({ points, metric, color }: ForecastChartProps) {
             return [formatKw(Number(value)), "forecast"];
           }}
         />
-        <Area dataKey="band" stroke="none" fill={color} fillOpacity={0.14} />
-        <Line dataKey="value" stroke={color} strokeWidth={2} dot={false} type="monotone" />
+        <Area dataKey="band" stroke="none" fill={color} fillOpacity={0.14} isAnimationActive={false} />
+        <Line dataKey="value" stroke={color} strokeWidth={2.5} dot={false} type="monotone" isAnimationActive={false} />
       </ComposedChart>
     </ResponsiveContainer>
   );
