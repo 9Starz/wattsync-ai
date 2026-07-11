@@ -1,6 +1,9 @@
+import { Activity, ArrowLeftRight, Leaf, Plug } from "lucide-react";
 import { TopBar } from "@/components/layout/TopBar";
 import { KpiCard } from "@/components/shared/KpiCard";
 import { SectionCard } from "@/components/shared/SectionCard";
+import { Sparkline } from "@/components/shared/Sparkline";
+import { MiniCompareBar } from "@/components/shared/MiniCompareBar";
 import { EnergyMixChart } from "@/components/dashboard/EnergyMixChart";
 import { DemandVsSupplyChart } from "@/components/dashboard/DemandVsSupplyChart";
 import { BatterySocGauge } from "@/components/dashboard/BatterySocGauge";
@@ -11,32 +14,62 @@ import { VppOptimizationRow } from "@/components/dashboard/VppOptimizationRow";
 import { forecastNext24h } from "@/lib/forecasting";
 import { getRecommendations } from "@/lib/ai/recommendations";
 import { getActiveAlerts, getDashboardData, getNowHour } from "@/lib/simulation";
-import { formatHourLabel, formatKg, formatKw, formatPct, formatRm, formatRmPerYear } from "@/lib/utils/format";
+import { formatHourLabel, formatKg, formatKw, formatKwh, formatPct, formatRm, formatRmPerYear } from "@/lib/utils/format";
+import { VIZ } from "@/lib/utils/chartColors";
 
 export const dynamic = "force-dynamic";
 
 export default function DashboardPage() {
   const data = getDashboardData();
   const alerts = getActiveAlerts();
-  const { current } = data;
+  const { current, rawTotals, aiTotals } = data;
   const nowHour = getNowHour();
   const forecast = forecastNext24h();
   const recommendations = getRecommendations();
+
+  // Today's trend up to now, sampled for a clean sparkline on each headline KPI.
+  const pts = data.aiOptimized.points;
+  const nowIdx = Math.max(4, Math.min(pts.length, Math.round((nowHour / 24) * pts.length) + 1));
+  const trail = pts.slice(0, nowIdx).filter((_, i) => i % 3 === 0);
+  const spark = (pick: (p: (typeof pts)[number]) => number) => trail.map(pick);
 
   return (
     <div className="flex flex-1 flex-col">
       <TopBar title="VPP Overview" subtitle="Unified view of every clean energy asset in the fleet" />
 
-      <div className="flex-1 space-y-6 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-6">
+        <div className="mx-auto w-full max-w-[1760px] space-y-5">
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <KpiCard label="Renewable Generation" value={formatKw(current.totalGenerationKw)} accent="green" hint="live" />
-          <KpiCard label="Total Demand" value={formatKw(current.totalDemandKw)} accent="blue" hint="building + EV" />
+          <KpiCard
+            label="Renewable Generation"
+            value={formatKw(current.totalGenerationKw)}
+            accent="green"
+            hint="live"
+            icon={Leaf}
+            footer={<Sparkline data={spark((p) => p.totalGenerationKw)} color={VIZ.green} />}
+          />
+          <KpiCard
+            label="Total Demand"
+            value={formatKw(current.totalDemandKw)}
+            accent="blue"
+            hint="building + EV"
+            icon={Activity}
+            footer={<Sparkline data={spark((p) => p.totalDemandKw)} color={VIZ.brand} />}
+          />
           <KpiCard
             label="Grid Import / Export"
             value={`${formatKw(current.gridImportKw)} / ${formatKw(current.gridExportKw)}`}
             hint="import / export"
+            icon={ArrowLeftRight}
+            footer={<Sparkline data={spark((p) => p.gridImportKw)} color={VIZ.grid} />}
           />
-          <KpiCard label="EV Charging Load" value={formatKw(current.evDemandKw)} hint="live" />
+          <KpiCard
+            label="EV Charging Load"
+            value={formatKw(current.evDemandKw)}
+            hint="live"
+            icon={Plug}
+            footer={<Sparkline data={spark((p) => p.evDemandKw)} color={VIZ.cyan} />}
+          />
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
@@ -46,6 +79,14 @@ export default function DashboardPage() {
             value={formatKg(data.carbonSavedKg)}
             accent="green"
             trend={`${formatPct(data.renewablePctImprovement)} more renewable use`}
+            footer={
+              <MiniCompareBar
+                before={rawTotals.totalCarbonKg}
+                after={aiTotals.totalCarbonKg}
+                color={VIZ.green}
+                format={formatKg}
+              />
+            }
           />
           <KpiCard
             label="Cost Saved (AI vs. no AI, today)"
@@ -53,6 +94,16 @@ export default function DashboardPage() {
             accent="green"
             trend={`≈ ${formatRmPerYear(data.costSavedUsd)} run-rate`}
             hint={`-${formatKw(data.peakDemandReductionKw)} peak import`}
+            footer={
+              <MiniCompareBar
+                before={rawTotals.totalGridImportKwh}
+                after={aiTotals.totalGridImportKwh}
+                color={VIZ.grid}
+                format={formatKwh}
+                beforeLabel="Grid import, no AI"
+                afterLabel="Grid import, with AI"
+              />
+            }
           />
         </div>
 
@@ -87,6 +138,7 @@ export default function DashboardPage() {
               ))}
             </div>
           </SectionCard>
+        </div>
         </div>
       </div>
     </div>
