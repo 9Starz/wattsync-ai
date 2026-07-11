@@ -54,6 +54,8 @@ Every number on every page derives from one simulation source, so the story is i
 | **AI Copilot** — grounded operator Q&A (Claude + rule-engine fallback) ![Copilot](docs/screenshots/copilot.png) | **Assets** — fleet inventory with utilization & health ![Assets](docs/screenshots/assets.png) |
 | **Development** — site screening, feasibility, VPP integration impact ![Development](docs/screenshots/development.png) | **Validation** — forecast accuracy vs actuals, confidence & error explanation ![Validation](docs/screenshots/validation.png) |
 
+**Design system:** the full enterprise brand/color/type reference — pitch-deck-ready, matching the app 1:1 — is in [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
+
 ## How the AI works (honestly)
 
 - **Simulation engine** (`lib/simulation/`) generates a realistic 24h day — solar/wind/hydro curves, building & EV demand, time-of-use prices, weather — in two variants: *raw* (assets uncoordinated) and *AI-optimized* (VPP-coordinated). Deterministic per calendar day, so demos are stable.
