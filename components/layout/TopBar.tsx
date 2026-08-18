@@ -1,7 +1,8 @@
 export function TopBar({ title, subtitle }: { title: string; subtitle?: string }) {
   const now = new Date();
-  const timeLabel = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-  const dateLabel = now.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+  const tz = "Asia/Kuala_Lumpur";
+  const timeLabel = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: tz });
+  const dateLabel = now.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", timeZone: tz });
 
   return (
     <header className="flex items-center justify-between border-b border-border bg-surface px-6 py-4">

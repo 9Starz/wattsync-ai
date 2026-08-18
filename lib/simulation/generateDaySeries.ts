@@ -8,6 +8,7 @@ import {
   windDiurnalBias,
 } from "./curves";
 import { clamp, createRng, gaussianNoise } from "./random";
+import { klDateKey, klHourToIso } from "../utils/time";
 import { DaySeries, IntervalPoint } from "./types";
 
 const SOLAR_CAPACITY = ASSETS.find((a) => a.type === "solar_farm")!.capacityKw;
@@ -200,18 +201,13 @@ function buildAiOptimizedVariant(base: BaseInputs[], seed: number): IntervalPoin
 }
 
 function hourToIso(hour: number): string {
-  const now = new Date();
-  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-  d.setMinutes(Math.round(hour * 60));
-  return d.toISOString();
+  return klHourToIso(hour);
 }
 
 const cache = new Map<number, { raw: DaySeries; aiOptimized: DaySeries }>();
 
 function seedForDayOffset(dayOffset: number): number {
-  const d = new Date();
-  d.setDate(d.getDate() + dayOffset);
-  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  return klDateKey(dayOffset);
 }
 
 /** Generates (and memoizes) a full day's raw + AI-optimized series, seeded by calendar date. */

@@ -1,3 +1,4 @@
+import { getNowHourKl } from "../utils/time";
 import { CARBON_INTENSITY_KG_PER_KWH, getTodaySeries } from "./generateDaySeries";
 import { DaySeries, IntervalPoint } from "./types";
 
@@ -68,7 +69,7 @@ function clampPct(v: number) {
 
 /** Current wall-clock time as a fractional hour of the day (e.g. 19.55 for 7:33 PM). */
 export function getNowHour(): number {
-  return new Date().getHours() + new Date().getMinutes() / 60;
+  return getNowHourKl();
 }
 
 export function latestPoint(series: DaySeries): IntervalPoint {
