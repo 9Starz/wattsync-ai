@@ -6,7 +6,7 @@
 
 ## ⚡ Judging in a hurry? 60 seconds:
 
-1. 🔗 **Live demo:** `ADD-VERCEL-URL-HERE` *(deploy: import this repo at [vercel.com/new](https://vercel.com/new), zero config)*
+1. 🔗 **Live demo:** **https://wattsync-ai.vercel.app** *(deployed on Vercel, zero config)*
 2. ▶ Open **`/demo`** — a 3-act story: the 6pm problem → three coordinated AI moves → the measurable result (**−23% grid imports, ~RM1,300/day saved ≈ RM466K/yr, 385 kg CO₂ avoided — same assets, same weather**)
 3. ✦ Ask the **`/copilot`**: *"Why did the battery discharge at 6pm?"* — every answer is grounded in the live fleet data
 4. 🎬 **Video walkthrough:** `ADD-VIDEO-LINK-HERE` · 📸 [Screenshots below](#-visual-tour) · 📜 [Full demo script](docs/DEMO.md)
