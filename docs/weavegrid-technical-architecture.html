@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
-  /* ============ WeaveGrid AI / WattSync AI — design tokens (from docs/DESIGN_SYSTEM.md) ============ */
+  /* ============ WeaveGrid AI — design tokens (from docs/DESIGN_SYSTEM.md) ============ */
   :root{
     --brand:#0F4C81; --brand-hover:#1565A5; --cyan:#00C2FF;
     --green:#27AE60; --amber:#F39C12; --red:#E74C3C;
@@ -150,7 +150,7 @@
       <div class="glyph">W</div>
       <div>
         <div style="font-size:20px; font-weight:800; letter-spacing:-.01em;">WeaveGrid AI</div>
-        <div style="font-size:10px; color:#bcd4ea; letter-spacing:.06em;">WattSync AI · Virtual Power Plant Platform</div>
+        <div style="font-size:10px; color:#bcd4ea; letter-spacing:.06em;">AI-Powered Virtual Power Plant &amp; Renewable Energy Intelligence Platform</div>
       </div>
     </div>
     <div class="cover-band">
@@ -165,7 +165,7 @@
     <div style="font-size:9px; font-weight:600; letter-spacing:.18em; color:#8fb6da; text-transform:uppercase;">Technical Architecture</div>
     <div style="font-size:46px; font-weight:800; line-height:1.02; letter-spacing:-.03em; margin:8px 0 12px;">One dashboard.<br/>A coordinated<br/>Virtual Power Plant.</div>
     <p style="font-size:12.5px; color:#dbeafe; max-width:150mm; line-height:1.55;">
-      WattSync AI unifies disconnected clean-energy assets — solar, wind, hydro, storage, EV, smart buildings —
+      WeaveGrid AI unifies disconnected clean-energy assets — solar, wind, hydro, storage, EV, smart buildings —
       into one AI-coordinated VPP, and proves with numbers that coordination cuts cost, carbon, and peak grid stress.
       This document maps the <b style="color:#fff;">as-built architecture</b> to source, and separates
       <b style="color:#fff;">current implementation</b> from <b style="color:#fff;">future roadmap</b>.
@@ -261,7 +261,7 @@
     </div>
   </div>
 
-  <div class="page__foot"><span><b>WeaveGrid AI</b> · WattSync AI Technical Architecture</span><span>02 · Executive Summary</span></div>
+  <div class="page__foot"><span><b>WeaveGrid AI</b> Technical Architecture</span><span>02 · Executive Summary</span></div>
 </section>
 
 <!-- =================================================================== 3. TECHNOLOGY STACK -->
@@ -303,7 +303,7 @@
 
   <h3 class="sec">Layer responsibilities</h3>
   <table>
-    <thead><tr><th style="width:20%">Layer</th><th style="width:26%">Technology</th><th>Responsibility in WattSync AI</th></tr></thead>
+    <thead><tr><th style="width:20%">Layer</th><th style="width:26%">Technology</th><th>Responsibility in WeaveGrid AI</th></tr></thead>
     <tbody>
       <tr><td><b>Presentation</b></td><td class="t-mono">app/ · React · Recharts</td><td>8 route pages rendered as server components; charts, KPI tiles, decision timeline, chat UI.</td></tr>
       <tr><td><b>Domain / AI</b></td><td class="t-mono">lib/forecasting · lib/optimization · lib/validation · lib/ai · lib/development</td><td>Pure TypeScript engines. Deterministic, explainable, unit-testable — no framework coupling.</td></tr>
@@ -322,7 +322,7 @@
     </div>
   </div>
 
-  <div class="page__foot"><span><b>WeaveGrid AI</b> · WattSync AI Technical Architecture</span><span>03 · Technology Stack</span></div>
+  <div class="page__foot"><span><b>WeaveGrid AI</b> Technical Architecture</span><span>03 · Technology Stack</span></div>
 </section>
 
 <!-- =================================================================== 4. SYSTEM ARCHITECTURE -->
@@ -383,7 +383,7 @@
     </div>
   </div>
 
-  <div class="page__foot"><span><b>WeaveGrid AI</b> · WattSync AI Technical Architecture</span><span>04 · System Architecture</span></div>
+  <div class="page__foot"><span><b>WeaveGrid AI</b> Technical Architecture</span><span>04 · System Architecture</span></div>
 </section>
 
 <!-- =================================================================== 5. DATA FLOW -->
@@ -447,7 +447,7 @@
     </tbody>
   </table>
 
-  <div class="page__foot"><span><b>WeaveGrid AI</b> · WattSync AI Technical Architecture</span><span>05 · Data Flow</span></div>
+  <div class="page__foot"><span><b>WeaveGrid AI</b> Technical Architecture</span><span>05 · Data Flow</span></div>
 </section>
 
 <!-- =================================================================== 6. AI ARCHITECTURE -->
@@ -525,7 +525,7 @@
     <b>Recommendations engine</b> (<span class="mono">lib/ai/recommendations.ts</span>) sits alongside these four: five time-aware rules emit fully-grounded cards — each with reason, expected impact, a 0–1 confidence score, a suggested action, and a validity window that expires once the peak passes.
   </div>
 
-  <div class="page__foot"><span><b>WeaveGrid AI</b> · WattSync AI Technical Architecture</span><span>06 · AI Architecture</span></div>
+  <div class="page__foot"><span><b>WeaveGrid AI</b> Technical Architecture</span><span>06 · AI Architecture</span></div>
 </section>
 
 <!-- =================================================================== 7. PDI -->
@@ -584,7 +584,7 @@
     <b>The planning→operations link is the differentiator.</b> Rather than a static spreadsheet, PDI models the recommended site's hourly output against the live fleet — so a developer sees exactly how much evening grid import the new asset would displace <em>today</em>, and its renewable-share lift. A 5-stage development roadmap (site control → commissioning &amp; VPP onboarding, months 0–24) frames the timeline.
   </div>
 
-  <div class="page__foot"><span><b>WeaveGrid AI</b> · WattSync AI Technical Architecture</span><span>07 · Project Development Intelligence</span></div>
+  <div class="page__foot"><span><b>WeaveGrid AI</b> Technical Architecture</span><span>07 · Project Development Intelligence</span></div>
 </section>
 
 <!-- =================================================================== 8. APPLICATION MODULES -->
@@ -618,7 +618,7 @@
     </tbody>
   </table>
 
-  <div class="page__foot"><span><b>WeaveGrid AI</b> · WattSync AI Technical Architecture</span><span>08 · Application Modules</span></div>
+  <div class="page__foot"><span><b>WeaveGrid AI</b> Technical Architecture</span><span>08 · Application Modules</span></div>
 </section>
 
 <!-- =================================================================== 9. BACKEND & DATABASE -->
@@ -683,7 +683,7 @@
   </table>
   <p class="small muted" style="margin-top:6px;">Target: Supabase / Postgres. The schema is designed (per project README); no persistence code ships in the MVP.</p>
 
-  <div class="page__foot"><span><b>WeaveGrid AI</b> · WattSync AI Technical Architecture</span><span>09 · Backend &amp; Database</span></div>
+  <div class="page__foot"><span><b>WeaveGrid AI</b> Technical Architecture</span><span>09 · Backend &amp; Database</span></div>
 </section>
 
 <!-- =================================================================== 10. DEPLOYMENT, SECURITY, SCALABILITY -->
@@ -733,7 +733,7 @@
     </div>
   </div>
 
-  <div class="page__foot"><span><b>WeaveGrid AI</b> · WattSync AI Technical Architecture</span><span>10 · Deployment · Security · Scalability</span></div>
+  <div class="page__foot"><span><b>WeaveGrid AI</b> Technical Architecture</span><span>10 · Deployment · Security · Scalability</span></div>
 </section>
 
 <!-- =================================================================== 11. LIMITATIONS vs ROADMAP -->
@@ -779,7 +779,7 @@
     <b>Why the seams matter.</b> Because the AI is isolated behind <span class="mono">forecastNext24h()</span> and <span class="mono">answerQuestion()</span>, and every page reads a single data contract, the MVP-to-production path is a series of localized replacements — not a rewrite. The demo's honesty (labeled rule engines, computed not canned figures) is exactly what makes the production story credible.
   </div>
 
-  <div class="page__foot"><span><b>WeaveGrid AI</b> · WattSync AI Technical Architecture</span><span>11 · Limitations &amp; Roadmap</span></div>
+  <div class="page__foot"><span><b>WeaveGrid AI</b> Technical Architecture</span><span>11 · Limitations &amp; Roadmap</span></div>
 </section>
 
 <!-- =================================================================== 12. TECHNICAL EVIDENCE -->
@@ -791,13 +791,13 @@
   <div class="grid g3" style="margin-bottom:14px;">
     <div class="card">
       <span class="tag tag--brand">Source code</span>
-      <h4 style="margin-top:6px;">GitHub repository</h4>
+      <h4 style="margin-top:6px;">WeaveGrid AI — Source Repository</h4>
       <p class="mono" style="color:var(--brand); margin-top:4px;">github.com/9Starz/wattsync-ai</p>
       <p style="margin-top:6px;">Full Next.js + TypeScript source, all engines, this document under <span class="mono">docs/</span>.</p>
     </div>
     <div class="card">
       <span class="tag tag--green">Live demo</span>
-      <h4 style="margin-top:6px;">Vercel deployment</h4>
+      <h4 style="margin-top:6px;">WeaveGrid AI — Live Demo</h4>
       <p class="mono" style="color:var(--brand); margin-top:4px;">wattsync-ai.vercel.app</p>
       <p style="margin-top:6px;">Zero-config deploy. Open <span class="mono">/demo</span> for the 60-second story; ask <span class="mono">/copilot</span> a live question.</p>
     </div>
@@ -838,7 +838,7 @@
     <b>Demo fleet.</b> Kedah LSS Park (4.2 MW solar) · Kudat Wind Pilot (2.5 MW) · Bakun Hydro (1.8 MW) · Cyberjaya BESS (1.5 MW / 6 MWh) · Putrajaya EV Hub (0.9 MW) · TRX Smart District (3.0 MW). Real Malaysian sites; calculations are engine-computed, not scripted.
   </div>
 
-  <div class="page__foot"><span><b>WeaveGrid AI</b> · WattSync AI Technical Architecture · v0.1.0</span><span>12 · Technical Evidence</span></div>
+  <div class="page__foot"><span><b>WeaveGrid AI</b> Technical Architecture · v0.1.0</span><span>12 · Technical Evidence</span></div>
 </section>
 
 </body>
